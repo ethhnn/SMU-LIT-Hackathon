@@ -6,7 +6,7 @@ The learner describes a non-confidential training objective, receives scenario-s
 
 **Status:** MVP scope, specification, and three local delivery tickets are documented. Application implementation and the working video demonstration have not started. Complete OpenLaw tutorial coverage remains a delivery target.
 
-The [specification](docs/spec.md) and [MVP plan](docs/mvp-plan.md) define the current scope. This README summarizes them and replaces the earlier cross-tool, full-tutorial proposal.
+The selected tools are **LawNet/OpenLaw, TAFEP, and Judiciary.gov.sg (SG Courts)**. The [specification](docs/spec.md) and [MVP plan](docs/mvp-plan.md) provide the implementation baseline, with OpenLaw as the first reviewed demonstration target. This README supersedes their earlier Litera Compare and iManage catalog examples; those documents have not yet been synchronized with the updated tool selection.
 
 ## The challenge
 
@@ -18,7 +18,7 @@ This prototype demonstrates contextual software assistance and generated trainin
 
 ## MVP experience
 
-1. **Describe a training objective.** Enter free text or choose an optional example: find a judgment, compare documents, or manage a case document.
+1. **Describe a training objective.** Enter free text or choose an optional example: find a judgment, locate fair employment guidance, or find a court hearing.
 2. **Explore relevant tools.** OpenAI recommends technologies from a curated catalog with intended uses, advantages, limitations, and tutorial coverage. Recommendations change with the objective; there is no mandatory list or count.
 3. **Choose a tool.** Receive contextual text help and ask follow-up questions within the same scenario chat.
 4. **Request a Help Clip where supported.** Generate a short narrated demonstration focused on the current question or supported action. Viewing a standalone screenshot is not a prerequisite.
@@ -34,17 +34,17 @@ Use generic or synthetic training scenarios. Real document uploads and confident
 
 ## Recommendations and tutorial coverage
 
-Recommendations are broader than the implemented tutorial library.
+The curated catalog contains the following three tools. Recommendations select relevant tools from this catalog; a scenario does not need to recommend all three. Tutorial availability depends on reviewed coverage.
 
 | Tool | MVP role | Tutorial coverage |
 | --- | --- | --- |
-| OpenLaw | Judgment-location recommendation and contextual guidance | First target for a fully reviewed demonstration workflow; required evidence is still incomplete |
-| Litera Compare | Catalog-based recommendation and high-level explanation for comparison objectives | Tutorial assets not yet added |
-| iManage | Catalog-based recommendation and high-level explanation for document-management objectives | Tutorial assets not yet added |
+| LawNet/OpenLaw | Locate judgments and navigate legal research resources; the first exercise uses public OpenLaw | Screenshots collected; first target for a fully reviewed demonstration workflow, with required evidence still incomplete |
+| TAFEP | Locate fair employment practices, workplace guidance, resources, and contact information | Screenshots collected; action review and tutorial implementation pending |
+| Judiciary.gov.sg (SG Courts) | Find court hearings, court services, judgments, and self-help resources | Screenshots collected; action review and tutorial implementation pending |
 
 Catalog entries contain capabilities, intended uses, pros, cons, and coverage information. They do not imply live integrations, firm endorsement, or verified operational tutorials.
 
-A learner selecting an uncovered tool still receives relevant high-level help and the label **“Tutorial assets not yet added.”** A comparison-only objective must not be redirected into an unrelated OpenLaw lesson. Combined objectives may receive multiple relevant recommendations explaining each tool's role; cross-tool operational handoffs remain deferred.
+A learner selecting an action without reviewed coverage still receives relevant high-level help and a clear label such as **“Tutorial not yet available.”** A workplace-guidance or court-hearing objective must not be redirected into an unrelated OpenLaw lesson. Combined objectives may receive multiple relevant recommendations explaining each tool's role; cross-tool operational handoffs remain deferred.
 
 Clip eligibility depends on the selected action's reviewed instructions and required assets, not merely the tool's presence in the catalog.
 
@@ -73,7 +73,15 @@ Core operational instructions remain fixed. OpenAI supplies supporting explanati
 
 Screenshots are primarily video scene assets. Highlights and pointer coordinates belong to the exact captured layout; expanded and collapsed sidebars require different positions. The clip shows the captured expected next state rather than generating a replacement interface.
 
-The repository currently contains 27 images in [LawNetScreenshots](Screenshots/LawNetScreenshots/) and 9 in [TAFEP](Screenshots/TAFEP/), named by visible page or interface state. These include material outside the selected workflow and do not expand MVP tutorial coverage. The [screenshot review](docs/screenshot-review.md) covers the earlier 11-image subset and still identifies those captures by their original timestamp names.
+The repository currently contains **86 screenshots**, named by visible page, section, or interface state:
+
+| Tool | Screenshot folder | Images |
+| --- | --- | --- |
+| LawNet/OpenLaw | [LawNetScreenshots](Screenshots/LawNetScreenshots/) | 27 |
+| TAFEP | [TAFEPScreenshots](Screenshots/TAFEPScreenshots/) | 21 |
+| Judiciary.gov.sg (SG Courts) | [JudiciaryGovScreenshots](Screenshots/JudiciaryGovScreenshots/) | 38 |
+
+The Judiciary captures include homepage menus, hearing-search filters, judgments, court services, e-platforms, Sheriff's sales and admiralty services, contact information, and court information pages. These collections include material outside the first OpenLaw workflow; collecting and naming images does not establish reviewed tutorial coverage. The [screenshot review](docs/screenshot-review.md) covers the earlier 11-image subset and still identifies those captures by their original timestamp names.
 
 Required preparation remains:
 
@@ -140,7 +148,7 @@ Tickets are prepared, not implemented. Their ready-for-agent status does not mea
 
 Use one user-facing end-to-end testing path with controlled AI/media outcomes for repeatable checks, plus one real generated narrated-video check.
 
-- Free-text comparison and judgment-location objectives produce relevant, different recommendations. Sample scenarios remain optional.
+- Free-text judgment-location, fair-employment-guidance, and court-hearing objectives produce relevant recommendations from LawNet/OpenLaw, TAFEP, and Judiciary.gov.sg. Sample scenarios remain optional.
 - Uncovered tools provide contextual high-level help and coverage labels without fabricated tutorials or unrelated redirection.
 - Contextual help follows the scenario and Help Focus without inferring completion.
 - Only an explicit clip request or retry starts video generation, and only for actions with reviewed coverage.

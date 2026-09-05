@@ -23,6 +23,6 @@ No screenshots were captured in that initial source check. Authenticated product
 
 ## Update after user-supplied screenshots
 
-The user confirmed the exact OpenLaw entry URL and supplied 11 screenshots, all now visually inspected. Search, date and coram controls, sorting options, and search-help content are visible; see the [screenshot review](screenshot-review.md). Earlier statements that those controls were unverified refer to the initial text-only check. Actual operations and an end-to-end retrieval workflow remain untested by this review.
+The user confirmed the exact OpenLaw entry URL. The original 11 OpenLaw captures were manually inspected; the supplied directories now contain 27 LawNet and 9 TAFEP screenshots. All 36 are included in the generated screenshot manifest and keyword index. Runtime OpenRouter selection visually checks shortlisted candidates, but neither indexing nor model inspection proves that the represented interaction was manually performed. See the [screenshot review](screenshot-review.md).
 
-The first prototype is now explicitly OpenLaw-only. A comparison tool is no longer a prerequisite for this milestone; cross-tool work is deferred.
+The first verified workflow target remains OpenLaw. TAFEP is now recommendation-eligible for screenshot-based guidance because the user supplied nine TAFEP captures. Cross-tool execution and combined multi-tool video remain deferred.

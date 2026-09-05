@@ -17,7 +17,7 @@ A generic or synthetic use case described by the Learner or selected from an opt
 _Avoid_: Mandatory lesson, client matter, live matter
 
 **Tool recommendation**:
-A scenario-specific suggestion of a catalog technology, with its role, advantages, limitations, and tutorial coverage.
+A scenario-specific suggestion of a catalog technology, with its role, advantages, limitations, and tutorial coverage. The learner may select a recommendation as input to a Shared Help Clip.
 _Avoid_: Verified Workflow, live integration
 
 **Tutorial coverage**:
@@ -52,6 +52,34 @@ _Avoid_: Arbitrary generated sequence
 The step or question the Learner is currently asking about within a Scenario chat.
 _Avoid_: Actual screen, completed step
 
+**Lesson Plan**:
+A manually curated record for one exact selected set of tools, with an ordered sequence of reviewed scenes and actions. It is required before the tutor can render a Shared Help Clip.
+_Avoid_: AI-generated workflow, inferred handoff
+
+**Shared Help Clip**:
+One requested tutorial clip that renders every scene in a matching Lesson Plan for the learner's selected tools. It may explain each tool's curated role, but does not claim an operational handoff unless that handoff is reviewed in the Lesson Plan.
+_Avoid_: Separate clip per selected tool, fabricated combined tutorial
+
+**Support Topic**:
+A legacy curated unit used by the manually reviewed OpenLaw starter action. New contextual screenshot selection uses the Screenshot Index instead of a fixed topic list.
+_Avoid_: General screenshot catalog, hardcoded question answer
+
+**Screenshot Index**:
+A generated JSON inventory of every supplied screenshot, including its tool, filename-derived keywords, dimensions, full image path, and thumbnail path. OpenRouter searches this index before visually inspecting candidates.
+_Avoid_: Question-specific lookup table, proof that an interaction was tested
+
+**Dynamic Screenshot Scene**:
+A screenshot-observation scene produced after OpenRouter selects and visually inspects one indexed image. It contains the exact asset ID, image-grounded instruction, caption, and highlight and is carried only in a signed generation token.
+_Avoid_: Verified Action, model-invented asset path
+
+**Screenshot Guide**:
+A visible interface screenshot with a grounded highlight, instruction or observation, expected result, and evidence-status label. Screenshot guidance can exist without video eligibility.
+_Avoid_: Verified Action unless manually tested
+
+**Contextual Teaching Turn**:
+One learner question and its appended OpenRouter-generated tutor answer, Screenshot Guides, coverage status, and optional explicitly generated Help Clip. It can use checked tools or, when none are checked, the current recommendations as context. Earlier turns remain visible while only a bounded recent history is sent as model context.
+_Avoid_: Replacement of the initial lesson, automatic video generation
+
 **Mock tool**:
 A clearly identified demonstration of a fictional firm's internal technology.
 _Avoid_: Live integration, supported commercial product
@@ -61,7 +89,7 @@ A short educational audio-video demonstration of user-system interactions for a 
 _Avoid_: Evidence of learner completion
 
 **Help Clip**:
-A tutorial clip focused on the Verified Action or supported portion of a workflow relevant to the learner's difficulty.
+A tutorial clip focused on a reviewed action or supported portion of a workflow relevant to the learner's difficulty. A Shared Help Clip is the selected-set form of this clip.
 _Avoid_: Full-workflow video, recording of the learner's work
 
 ## Research product names

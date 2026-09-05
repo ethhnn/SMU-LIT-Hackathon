@@ -1,638 +1,69 @@
-# SMU-LIT-Hackathon
-SMU LIT Hackathon Project
+# R&T Workflow Tutor
 
-# AI-Powered Just-in-Time Legal Technology Tutor
+This hackathon MVP helps a lawyer learn how to operate a relevant technology for a non-confidential training objective. It is a software-training tutor, not a legal-advice tool.
 
-An AI-powered training platform that helps lawyers learn how to use firm-approved technologies **in the context of real legal work**.
+The learner writes a free-text objective or selects a sample. An OpenRouter-routed model recommends relevant technologies from a curated catalog, with intended uses, pros, limits, and tutorial coverage. The learner checks one or more recommended tools for a shared Help Clip and can continue with contextual teaching questions about that selected set.
 
-Instead of providing separate tutorials for individual tools, the platform begins with the lawyer's actual task, recommends suitable technologies, builds a cross-tool workflow, and automatically generates a short personalised audio-video tutorial showing how to complete that workflow.
-
----
-
-## Problem
-
-Law firms may introduce new technologies, tools, and processes, but successful adoption can still be difficult.
-
-Common problems include:
-
-* Training materials being scattered across different platforms.
-* Lawyers needing to watch several tutorials to complete one task.
-* Existing training being organised around **individual tools** rather than **real legal workflows**.
-* Significant time being required to manually create short training videos.
-* Lawyers being less willing to adopt unfamiliar tools when their relevance to daily work is unclear.
-
-The project addresses the challenge:
-
-> **How might law firms encourage their lawyers to successfully adopt and integrate new technologies, tools, processes and ways of working into their daily activities?**
-
----
-
-## Proposed Solution
-
-The platform changes the usual approach to technology training.
-
-Instead of asking:
-
-> "How do I use Tool X?"
-
-The lawyer can ask:
-
-> "How do I complete this legal task?"
-
-For example:
-
-> "I need to research how Singapore courts have interpreted a contractual clause and summarise the relevant cases."
-
-The system then:
-
-1. Understands the lawyer's task.
-2. Recommends suitable firm-approved tools.
-3. Explains the advantages and limitations of each tool.
-4. Allows the lawyer to select their preferred tools.
-5. Generates a workflow connecting those tools.
-6. Creates a short personalised tutorial explaining the complete workflow.
-
----
-
-## User Flow
+The supplied asset library contains 27 LawNet screenshots and 9 TAFEP screenshots. OpenRouter searches their generated keyword index and visually checks candidate images for each objective or question. These images support labelled screenshot-observation clips; the separately reviewed OpenLaw workflow coverage remains limited to locating the Search field. Litera Compare and iManage receive high-level text only until screenshots are supplied.
 
 ```text
-Lawyer enters legal scenario
-        ↓
-OpenAI understands the task
-        ↓
-Recommends suitable approved tools
-        ↓
-Shows advantages and limitations
-        ↓
-Lawyer selects preferred tools
-        ↓
-OpenAI generates cross-tool workflow
-        ↓
-Generate Tutorial
-        ↓
-Select verified screenshots / clips
-        ↓
-Generate storyboard, narration and captions
-        ↓
-Remotion renders tutorial
-        ↓
-OpenAI TTS generates narration
-        ↓
-FFmpeg produces final video
-        ↓
-Personalised short-form tutorial
+Free-text training objective
+  → OpenRouter scenario interpretation
+  → Curated tool recommendations
+  → Checkbox selection for a shared Help Clip
+  → Complete tool-specific image keyword index
+  → OpenRouter shortlist + visual screenshot selection
+  → Shared contextual guidance and Help Focus
+  → Explicit Generate shared Help Clip request for a grounded scene
+  → OpenRouter supporting-style selection and TTS
+  → Remotion animation + FFmpeg MP4 processing
+  → Playable “Training demonstration” MP4
+  → Continuing question → answer → screenshot/optional video turns
 ```
 
----
+The tutor never controls, observes, or automates the learner’s OpenLaw browser tab. It does not accept documents or confidential matter information, infer task completion, build progress tracking, invent cross-tool workflows or handoffs, or assess legal relevance.
 
-## Example Use Case
+## Run locally
 
-### Scenario
+1. Copy `.env.example` to `.env` and set `OPENROUTER_API_KEY`. Keep `.env` local; it is ignored by Git.
+2. Install dependencies with `pnpm install`.
+3. Start the tutor with `pnpm dev`.
+4. Open the local URL shown by Next.js.
 
-A lawyer enters:
+The recommendation flow stays usable without a key through a catalog fallback, but screenshot interpretation and narrated Help Clips need the local OpenRouter key. Existing local `OPENAI_API_KEY` entries are accepted only as a migration alias for the supplied OpenRouter key; use `OPENROUTER_API_KEY` for new setup. `NEXT_PUBLIC_CONTEXTUAL_QUESTION_WINDOW=3` keeps the latest three complete question-and-answer turns as contextual memory for both image selection and answering.
 
-> "I need to find recent Singapore Supreme Court cases about contractual interpretation and summarise the relevant judgments."
+## Verify the MVP
 
-The platform could recommend tools such as:
+Run the lightweight user-facing checks:
 
-### LawNet / OpenLaw
-
-**Advantages**
-
-* Focused on Singapore legal materials.
-* Provides access to Singapore judgments.
-* Allows lawyers to review original judicial decisions.
-
-**Limitations**
-
-* Relevant cases may still need to be identified manually.
-* Primarily supports legal research rather than summarisation.
-
-### Firm Legal AI
-
-**Advantages**
-
-* Can quickly summarise selected judgments.
-* Supports natural-language questions.
-* Can help locate relevant sections within long documents.
-
-**Limitations**
-
-* AI-generated outputs may contain errors.
-* Important conclusions should be checked against the original judgment.
-
-### Internal Knowledge Base
-
-**Advantages**
-
-* Contains previous firm work, precedents, and templates.
-* Provides organisation-specific knowledge.
-
-**Limitations**
-
-* Limited to information already stored internally.
-* May not contain the newest cases.
-
-The lawyer might choose:
-
-```text
-☑ LawNet / OpenLaw
-☑ Firm Legal AI
-☐ Internal Knowledge Base
+```bash
+pnpm test
+pnpm build
 ```
 
-The generated workflow could then be:
+After adding the API key, run one real-media check:
 
-```text
-LawNet
-   ↓
-Search relevant judgments
-   ↓
-Open relevant case
-   ↓
-Review original judgment
-   ↓
-Firm Legal AI
-   ↓
-Import selected judgment
-   ↓
-Generate summary
-   ↓
-Verify important conclusions against original judgment
+```bash
+pnpm render:demo
 ```
 
-The platform then creates **one tutorial covering the entire workflow**.
+It writes a narrated MP4 to `public/generated/`. Inspect it for audible narration, readable captions, aligned search-field highlight, and normal playback. This manual check is required before claiming the playable Help Clip milestone is complete.
 
----
+## Current OpenLaw asset boundary
 
-## Verified Tutorial Generation
+The selected public training target and exact asset status live in [docs/openlaw-training-assets.md](docs/openlaw-training-assets.md).
 
-The platform does **not** use generative video to recreate software interfaces.
+- **Ready:** the starting OpenLaw judgments screen and the reviewed instruction to locate the Search field.
+- **Pending manual capture and rehearsal:** populated search, submitted results, and opened matching judgment.
 
-Instead, it maintains a library of:
+The app labels screenshot observations separately from reviewed actions. A single supplied image may produce a screenshot-based clip after multimodal selection. Do not represent the four-step judgment-location workflow or any multi-tool clip as verified until the remaining materials are captured, reviewed, and rehearsed.
 
-* Verified screenshots.
-* Short recorded interaction clips.
-* UI action metadata.
+## Project source of truth
 
-This prevents the generated tutorial from displaying hallucinated:
+- [MVP specification](docs/spec.md)
+- [MVP plan](docs/mvp-plan.md)
+- [Domain vocabulary](CONTEXT.md)
+- [Architecture decisions](docs/ADRs)
+- [Local ticket tracker](docs/agents/issue-tracker.md)
 
-* Buttons.
-* Menus.
-* Interface layouts.
-* Navigation steps.
-* Software functionality.
-
-The core design principle is:
-
-```text
-OpenAI
-→ decides WHAT should be taught
-
-Verified UI metadata
-→ determines WHERE the action occurs
-
-Remotion
-→ determines HOW it is visually presented
-
-FFmpeg
-→ produces the final video
-```
-
----
-
-## Verified Asset Library
-
-Each supported tool contains reusable interface assets.
-
-Example:
-
-```text
-LawNet / OpenLaw
-├── Search interface
-├── Search results
-├── Filter results
-├── Judgment view
-└── Judgment navigation
-
-Firm Legal AI
-├── Upload document
-├── Analyse document
-├── Ask question
-├── Generate summary
-└── Export output
-```
-
-Assets can be stored as either screenshots or short video clips.
-
-### Screenshots
-
-Best suited for:
-
-* Button clicks.
-* Menu highlighting.
-* Search fields.
-* Static interface explanations.
-* Zooming into relevant information.
-
-### Short Video Clips
-
-Best suited for:
-
-* Dropdown menus.
-* Animations.
-* Loading behaviour.
-* Complex interactions.
-* Multi-step UI sequences.
-
-These assets are not complete tutorials.
-
-They act as reusable **training building blocks** that can be combined dynamically depending on the user's task.
-
----
-
-## UI Metadata
-
-Each verified screen can contain metadata describing available actions.
-
-Example:
-
-```json
-{
-  "tool": "LawNet OpenLaw",
-  "screen": "search_results",
-  "actions": [
-    {
-      "id": "open_judgment",
-      "label": "Open relevant judgment",
-      "target": {
-        "x": 420,
-        "y": 315,
-        "width": 510,
-        "height": 55
-      },
-      "nextScreen": "judgment_view"
-    }
-  ]
-}
-```
-
-This allows the tutorial renderer to accurately determine where to:
-
-* Move the cursor.
-* Highlight an element.
-* Draw a circle.
-* Place an arrow.
-* Zoom into the interface.
-
----
-
-## AI-Generated Storyboard
-
-After the lawyer selects their tools, OpenAI creates a structured tutorial storyboard.
-
-Example:
-
-```json
-{
-  "title": "Researching and Summarising Contractual Interpretation Cases",
-  "steps": [
-    {
-      "tool": "LawNet",
-      "screen": "search",
-      "action": "enter_query",
-      "caption": "Search for relevant judgments",
-      "narration": "Begin by searching for Singapore judgments relating to contractual interpretation."
-    },
-    {
-      "tool": "LawNet",
-      "screen": "search_results",
-      "action": "open_judgment",
-      "caption": "Open the relevant judgment",
-      "narration": "Review the search results and open the judgment most relevant to your issue."
-    },
-    {
-      "tool": "Firm Legal AI",
-      "screen": "upload",
-      "action": "upload_judgment",
-      "caption": "Import the judgment",
-      "narration": "Next, import the selected judgment into the firm's approved AI tool."
-    },
-    {
-      "tool": "Firm Legal AI",
-      "screen": "summary",
-      "action": "generate_summary",
-      "caption": "Generate a case summary",
-      "narration": "Use the AI tool to produce an initial summary of the judgment."
-    }
-  ]
-}
-```
-
----
-
-## Video Generation Pipeline
-
-```text
-Verified Screenshots / Video Clips
-            +
-OpenAI-Generated Storyboard
-            +
-OpenAI-Generated Narration
-            +
-OpenAI-Generated Captions
-            ↓
-         Remotion
-            ↓
- ┌──────────────────────┐
- │ Cursor animations    │
- │ Highlights           │
- │ Circles              │
- │ Arrows               │
- │ Zooms                │
- │ Scene transitions    │
- │ Subtitles            │
- └──────────────────────┘
-            ↓
-       OpenAI TTS
-            ↓
-      Narration Audio
-            ↓
-         FFmpeg
-            ↓
-    Final MP4 Tutorial
-```
-
----
-
-## System Architecture
-
-```text
-                    USER SCENARIO
-                         │
-                         ▼
-                    OPENAI API
-                         │
-                  Understand Task
-                         │
-                         ▼
-                TOOL RECOMMENDATION
-                         │
-              ┌──────────┼──────────┐
-              ▼          ▼          ▼
-           Tool A     Tool B     Tool C
-              │          │          │
-            Pros       Pros       Pros
-            Cons       Cons       Cons
-              └──────────┼──────────┘
-                         ▼
-                   USER SELECTION
-                         │
-                         ▼
-                    OPENAI API
-                         │
-                 Generate Workflow
-                         │
-                         ▼
-               VERIFIED ASSET LIBRARY
-                         │
-         ┌───────────────┼───────────────┐
-         ▼               ▼               ▼
-    Screenshots      Video Clips     UI Metadata
-         └───────────────┼───────────────┘
-                         ▼
-                    OPENAI API
-                         │
-                 Generate Storyboard
-                 Generate Narration
-                  Generate Captions
-                         │
-                  ┌──────┴──────┐
-                  ▼             ▼
-              Remotion      OpenAI TTS
-                  │             │
-                  └──────┬──────┘
-                         ▼
-                       FFmpeg
-                         │
-                         ▼
-              PERSONALISED TUTORIAL
-```
-
----
-
-## Proposed Technology Stack
-
-| Component        | Technology                   | Purpose                                                      |
-| ---------------- | ---------------------------- | ------------------------------------------------------------ |
-| Frontend         | Next.js / React              | User interface                                               |
-| AI reasoning     | OpenAI API                   | Understand scenarios, recommend tools and generate workflows |
-| Storyboard       | OpenAI API                   | Generate tutorial scenes, instructions and captions          |
-| Narration        | OpenAI Text-to-Speech        | Generate tutorial voice                                      |
-| Video rendering  | Remotion                     | Render animated tutorial scenes                              |
-| Video processing | FFmpeg                       | Merge, trim and encode MP4 output                            |
-| Database         | SQLite                       | Store tools, assets, actions and metadata                    |
-| UI assets        | Verified screenshots / clips | Provide accurate interface visuals                           |
-
-OpenAI is intended to be the project's **only generative AI provider**.
-
----
-
-## Role of OpenAI
-
-OpenAI is responsible for:
-
-* Understanding the lawyer's scenario.
-* Recommending suitable tools.
-* Explaining advantages and limitations.
-* Constructing cross-tool workflows.
-* Selecting tutorial steps.
-* Generating structured storyboards.
-* Writing narration.
-* Writing captions.
-* Generating explanations.
-* Determining which actions should be highlighted.
-* Generating narration audio through text-to-speech.
-
-OpenAI does **not** invent the software interface shown to the user.
-
-The visual interface comes from verified assets.
-
----
-
-## MVP Scope
-
-The hackathon prototype does not need to support every legal platform.
-
-A realistic MVP could contain:
-
-```text
-3 tools
-×
-5–8 verified actions per tool
-=
-Approximately 15–24 reusable actions
-```
-
-### Tool 1 — LawNet / OpenLaw
-
-Possible actions:
-
-* Search cases.
-* Filter judgments.
-* Open judgment.
-* Navigate judgment.
-* Identify relevant sections.
-
-### Tool 2 — Legal AI
-
-Possible actions:
-
-* Upload judgment.
-* Generate summary.
-* Ask questions.
-* Identify relevant sections.
-* Export output.
-
-### Tool 3 — Internal Knowledge System
-
-Possible actions:
-
-* Search internal precedents.
-* Open previous matter.
-* Find template.
-* View previous analysis.
-* Save relevant material.
-
-These reusable actions can be combined into different workflows without requiring a manually recorded tutorial for every possible legal scenario.
-
----
-
-## Key Innovation
-
-Traditional legal technology training is generally:
-
-```text
-Tool A Tutorial
-Tool B Tutorial
-Tool C Tutorial
-Tool D Tutorial
-```
-
-Our approach reverses this model:
-
-```text
-REAL-LIFE LEGAL TASK
-        ↓
-Understand task
-        ↓
-Recommend approved tools
-        ↓
-User selects tools
-        ↓
-Generate cross-tool workflow
-        ↓
-Create one personalised tutorial
-```
-
-The platform therefore shifts training from:
-
-> **tool-centric learning**
-
-to:
-
-> **task-centric, just-in-time learning**
-
-The important distinction is that the tutorial is generated around **what the lawyer is trying to accomplish**, rather than around a single piece of software.
-
----
-
-## Why Not Fully Generative Video?
-
-Fully generative video could recreate software interfaces inaccurately.
-
-Possible issues include:
-
-* Incorrect button names.
-* Missing interface elements.
-* Invented menus.
-* Incorrect navigation.
-* Different layouts.
-* Hallucinated functionality.
-
-For software education, users need to see the actual interface they will use.
-
-The proposed approach therefore combines:
-
-```text
-Verified UI
-+
-Generative AI intelligence
-+
-Programmatic video generation
-```
-
-This aims to provide both:
-
-* **Accuracy**
-* **Personalisation**
-
----
-
-## Value Proposition
-
-> **Instead of training lawyers tool-by-tool, the platform starts from the lawyer's real-life task, recommends suitable approved technologies, allows the lawyer to choose their preferred workflow, and uses generative AI together with verified interface assets to automatically create a short personalised audio-video tutorial showing how those tools can be used together.**
-
-Potential benefits include:
-
-* Increased awareness of available technologies.
-* Lower resistance to unfamiliar tools.
-* Just-in-time learning.
-* Faster technology adoption.
-* Reduced manual creation of training videos.
-* Greater use of approved firm technologies.
-* Training that is more relevant to actual legal work.
-
----
-
-## Project Status
-
-**Current stage:** Hackathon prototype development and planning.
-
-The MVP will focus on demonstrating:
-
-1. Scenario understanding.
-2. Tool recommendation.
-3. Tool selection.
-4. Cross-tool workflow generation.
-5. Verified asset retrieval.
-6. AI storyboard generation.
-7. Automated tutorial rendering.
-8. AI-generated narration.
-9. Final MP4 generation.
-
----
-
-## Next Steps
-
-* [ ] Finalise the three tools included in the MVP.
-* [ ] Define supported actions for each tool.
-* [ ] Capture verified screenshots and interaction clips.
-* [ ] Create UI action metadata.
-* [ ] Build the tool and asset database.
-* [ ] Implement scenario-to-tool recommendation.
-* [ ] Implement workflow generation.
-* [ ] Define the storyboard JSON schema.
-* [ ] Build Remotion tutorial templates.
-* [ ] Integrate OpenAI text-to-speech.
-* [ ] Build the FFmpeg rendering pipeline.
-* [ ] Connect the frontend to the generation pipeline.
-* [ ] Test several real-life legal scenarios.
-* [ ] Validate generated tutorials against the verified workflows.
-
----
-
-## Disclaimer
-
-This repository describes a **hackathon prototype concept**. Supported tools, APIs, workflows, interface assets, and implementation details may change as development progresses.
+The local tickets preserve their dependency order: asset preparation and scenario guidance can proceed independently; the full Help Clip ticket remains blocked until the asset workflow is complete and the real rendered clip is inspected. The shared-composer ticket records the completed selection and coverage-gating work.

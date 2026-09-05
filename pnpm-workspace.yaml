@@ -1,0 +1,4 @@
+allowBuilds:
+  # Next and Remotion use esbuild; the Help Clip encoder needs ffmpeg-static.
+  esbuild: true
+  ffmpeg-static: true

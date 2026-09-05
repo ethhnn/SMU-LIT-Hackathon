@@ -1,0 +1,11 @@
+node_modules/
+.next/
+coverage/
+test-results/
+*.tsbuildinfo
+public/generated/*
+!public/generated/.gitkeep
+.env
+.env.local
+.env.*.local
+!.env.example

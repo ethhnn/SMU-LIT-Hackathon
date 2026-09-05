@@ -4,7 +4,7 @@ status: accepted
 
 # Base MVP support on reviewed training evidence
 
-The original proposal uses live website inspection to repair gaps or stale screenshots. The initial MVP will instead support demonstrable guidance backed by checked interface states, manually tested actions, reviewed instructions, and known expected next states, with an explicit fallback when verified guidance is unavailable. This trades coverage and automatic adaptation for a smaller, reviewable demonstration.
+The original proposal uses live website inspection to repair gaps or stale screenshots. The initial MVP will instead use a bounded library of supplied interface screenshots and reviewed action records, with an explicit fallback when no supplied evidence supports the question. Evidence status remains visible: a manually tested action is a reviewed instruction, while a control that is merely visible in a supplied image is a screenshot observation and must not be described as a verified interaction. This trades coverage and automatic adaptation for a smaller, reviewable demonstration.
 
 Real products require legitimate interface access and verification of the demonstrated workflow. An explicitly labeled mock internal tool is an acceptable alternative; it must not imply a live integration with an inaccessible commercial product. Manual inspection to author training materials remains allowed; runtime live website inspection is outside this MVP.
 

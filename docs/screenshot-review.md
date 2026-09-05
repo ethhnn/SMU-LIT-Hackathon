@@ -1,6 +1,8 @@
 # OpenLaw screenshot review
 
-All 11 PNGs in Screenshots/LawNetScreenshots were visually inspected on 5 September 2026. Original files were not edited. Filename times below identify captures dated 2026-09-05; they are not an interaction log or proof of capture provenance.
+The original 11 PNGs in `Screenshots/LawNetScreenshots` were visually inspected on 5 September 2026. The directory now contains 27 LawNet images, and `Screenshots/TAFEP` contains 9 more. Asset preparation indexes all 36 files in `public/assets/screenshots/manifest.json` and writes their searchable filename keywords to `public/assets/screenshots/image-keywords.json`. Original files are not edited. Index inclusion is not manual verification of an interaction.
+
+For each current question, OpenRouter searches every indexed image belonging to the applicable recommended or checked tools, then visually inspects a shortlist of up to six thumbnails. The full image path and dimensions are resolved by the server after selection. This replaces the earlier three-topic lookup while keeping the distinction between screenshot observation and a rehearsed action.
 
 ## Inventory
 

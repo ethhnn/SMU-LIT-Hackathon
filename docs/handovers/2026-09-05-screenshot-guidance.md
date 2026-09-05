@@ -2,10 +2,14 @@
 
 **Project:** R&T Workflow Tutor / SMU legal-tech hackathon  
 **Date:** 5 September 2026  
-**Status:** Open; reproduced in the running application. Fixes have not been implemented in this handover.  
+**Status:** Implemented on 6 September 2026; retain this document as reproduction evidence.
 **Local application:** http://localhost:3001/
 
 The tutor can return a plausible instruction with the wrong page or a highlight covering most of the screen. It also forces every visual answer into one screenshot, even when explaining the task needs several pages. Fix retrieval, evidence grounding, and the response structure together; changing the circle styling alone will not resolve this.
+
+## Resolution update — 6 September 2026
+
+The application now validates all screenshot files against website-specific Markdown references, prioritizes the current question over older scenario and conversation terms, carries previously shown image IDs into subsequent selection, and returns the minimum useful ordered sequence of up to three independently grounded screenshots. Initial broad objectives can therefore show access first and continue into the destination page and its useful controls. The signed Help Clip payload and renderer now preserve that ordered sequence. Automated route, UI, and multi-scene token tests pass; highlight geometry should still be visually inspected during real-media checks because it remains model-produced.
 
 ## What the user needs
 

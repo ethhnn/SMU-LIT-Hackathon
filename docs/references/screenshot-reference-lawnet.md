@@ -45,7 +45,30 @@ Several products and generations of the SAL interface appear in this folder, so 
 | `sal-motor-accident-claims-online-outcome-simulator.png` | SAL Motor Accident Claims Online landing page. Primary actions are **Run Responsibility Simulation** (who is at fault), **Run Quantum Simulation** (amount of damages), and **Retrieve Past Simulations**. Each simulator card has a **Learn more** control with a down-arrow. The notices bar has **View All**, and a smiley feedback/help launcher is visible at lower left. |
 | `scc-online-keyword-search-advanced-options.png` | SCC Online **Keyword Search** with Advanced Search Options. Query field includes a small field dropdown and square magnifier **Search** button. Match radios are **All Words** (selected), **Phrase**, **Any Words**, and **Boolean**. Tabs are **Keyword Search** (selected), **Find By Citation**, and **Find By Party Name**. Filters: **Year From 1950** and **To 2026** dropdowns; **NEAR MEANS 10** dropdown; Search Area radios for Entire Document (selected), Digest Note Only, Party Names Only, Author Only, Citations Only, Coram Only, Judge Only, plus **Judges list**; and **Include synonyms and word stems** checkbox. Header icons provide Help, notifications, and settings; a floating notification button is also visible. |
 
+## Confirmed screenshot paths
+
+The public OpenLaw paths below were checked against the live LawNet 4.0/OpenLaw site on 6 September 2026. The signed-in LawNet, Academy Library, and Asian Insights state changes are limited to transitions whose source and destination controls are both visible in the supplied captures; authentication itself is not treated as a screenshot transition.
+
+| From image | Visible action that produces the next state | To image | Live verification |
+| --- | --- | --- | --- |
+| `lawnet-openlaw-judgments-expanded-sidebar.png` | Expand **Decision Date**, set the visible year range, and apply the filter. | `lawnet-openlaw-judgments-decision-date-filter.png` | Same `/openlaw/singapore/judgments/supreme-court` results page |
+| `lawnet-openlaw-judgments-expanded-sidebar.png` | Open the **Date: Recent → Oldest** sort dropdown. | `lawnet-openlaw-judgments-sort-menu.png` | Same OpenLaw results page |
+| `lawnet-openlaw-judgments-expanded-sidebar.png` | Expand **Legal Resources** in the left navigation. | `lawnet-openlaw-legal-resources-menu.png` | Same OpenLaw shell |
+| `lawnet-openlaw-judgments-expanded-sidebar.png` | Expand **Asian Insights** in the left navigation. | `lawnet-openlaw-asian-insights-menu.png` | Same OpenLaw shell |
+| `lawnet-openlaw-judgments-expanded-sidebar.png` | Focus or hover over the blue search-cheatsheet information button. | `lawnet-openlaw-search-cheatsheet-tooltip.png` | Same OpenLaw search form |
+| `lawnet-openlaw-search-cheatsheet-tooltip.png` | Select the blue search-cheatsheet information button. | `lawnet-openlaw-search-cheatsheet-dialog.png` | Same OpenLaw search form with modal opened |
+| `lawnet-openlaw-search-cheatsheet-dialog.png` | Select **Close (X)** in the Search Cheatsheet List dialog. | `lawnet-openlaw-judgments-expanded-sidebar.png` | Same OpenLaw search form with modal closed |
+| `lawnet-openlaw-asian-insights-menu.png` | Select **Latest News** in the Asian Insights flyout while signed out. | `lawnet-asian-insights-preview-signed-out.png` | OpenLaw shell → Asian Insights signed-out preview |
+| `lawnet-openlaw-asian-insights-menu.png` | Select **Podcasts** in the Asian Insights flyout while signed out. | `lawnet-asian-insights-regional-counsel-podcasts-signed-out.png` | OpenLaw shell → Asian Insights Podcasts |
+| `lawnet-asian-insights-preview-signed-out.png` | Select the **Podcasts** top tab. | `lawnet-asian-insights-regional-counsel-podcasts-signed-out.png` | Same signed-out Asian Insights shell |
+| `lawnet-asian-insights-regional-counsel-podcasts-signed-out.png` | Select the **Preview** top tab. | `lawnet-asian-insights-preview-signed-out.png` | Same signed-out Asian Insights shell |
+| `lawnet-asian-insights-latest-news-signed-in.png` | Select the **Podcasts** top tab. | `lawnet-asian-insights-regional-counsel-podcasts-signed-in.png` | Same signed-in Asian Insights shell |
+| `lawnet-asian-insights-regional-counsel-podcasts-signed-in.png` | Select the **Latest** top tab. | `lawnet-asian-insights-latest-news-signed-in.png` | Same signed-in Asian Insights shell |
+| `lawnet-research-ai-search.png` | Select **Classic** beside LawNet AI. | `lawnet-research-classic-search.png` | Same signed-in LawNet Research page with search mode changed |
+| `lawnet-research-classic-search.png` | Select **LawNet AI** beside Classic. | `lawnet-research-ai-search.png` | Same signed-in LawNet Research page with search mode changed |
+| `lawnet-academy-library-my-books-empty.png` | Open the profile/avatar menu. | `lawnet-academy-library-account-menu.png` | Same Academy Library My Books page |
+| `lawnet-academy-library-account-menu.png` | Close the profile/avatar menu by selecting the avatar again or clicking outside it. | `lawnet-academy-library-my-books-empty.png` | Same Academy Library My Books page |
+
 ## Runtime note
 
 The current asset-preparation script indexes all 27 images under the `openlaw` tool ID even though several show broader LawNet or separate SAL services. Correct product identity before converting this reference into runtime metadata.
-

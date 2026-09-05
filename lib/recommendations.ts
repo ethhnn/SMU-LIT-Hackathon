@@ -72,7 +72,7 @@ export const recommendFromCatalog = (scenario: string): RecommendationResponse =
 
 const catalogPrompt = TOOL_CATALOG.map(
   (tool) =>
-    `- ${tool.id}: ${tool.name}. Intended use: ${tool.intendedUse}. Capabilities: ${tool.capabilities.join(", ")}.`,
+    `- ${tool.id}: ${tool.name}. Intended use: ${tool.intendedUse}. Capabilities: ${tool.capabilities.join(", ")}. Limitations: ${tool.cons.join("; ")}.`,
 ).join("\n");
 
 export const recommendTools = async (
@@ -95,7 +95,8 @@ export const recommendTools = async (
           content:
             "You recommend software from a small, curated training catalog. " +
             "Return only JSON with a recommendations array. Each entry must have toolId. " +
-            "Select one to three relevant catalog tools. Do not give legal advice, determine legal relevance, " +
+            "Select only tools whose stated intended use or capabilities directly satisfy part of the objective; fewer accurate recommendations are better than adjacent but unsupported ones. Treat legislation, official gazettes, judgments, guidance, media announcements, document comparison, and document management as distinct needs. Never recommend a judgments tool as a source of enacted legislation, or a media page as an authoritative publication source. If the catalog does not cover part of the objective, do not disguise that gap by selecting an unrelated tool. " +
+            "Do not give legal advice, determine legal relevance, " +
             "invent operational workflows, or describe cross-tool handoffs. Do not claim tutorial coverage.",
         },
         {

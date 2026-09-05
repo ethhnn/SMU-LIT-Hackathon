@@ -8,6 +8,7 @@ export type GroundingStatus =
 
 export type ScreenshotGuide = {
   id: string;
+  screenshotAssetId?: string;
   toolId: ToolId;
   toolName: string;
   title: string;
@@ -47,6 +48,7 @@ if (
 
 const searchGuide: ScreenshotGuide = {
   id: "openlaw-search-field-guide",
+  screenshotAssetId: "openlaw-lawnet-openlaw-judgments-expanded-sidebar",
   toolId: "openlaw",
   toolName: openLaw.name,
   title: searchAction.title,
@@ -62,6 +64,7 @@ const searchGuide: ScreenshotGuide = {
 
 const dateGuide: ScreenshotGuide = {
   id: "openlaw-decision-date-guide",
+  screenshotAssetId: "openlaw-lawnet-openlaw-judgments-decision-date-filter",
   toolId: "openlaw",
   toolName: openLaw.name,
   title: "Filter by Decision Date",
@@ -80,6 +83,7 @@ const dateGuide: ScreenshotGuide = {
 
 const sortGuide: ScreenshotGuide = {
   id: "openlaw-sort-order-guide",
+  screenshotAssetId: "openlaw-lawnet-openlaw-judgments-sort-menu",
   toolId: "openlaw",
   toolName: openLaw.name,
   title: "Change the judgment sort order",

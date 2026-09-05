@@ -88,6 +88,7 @@ export const contextualQuestionRequestSchema = z.object({
   toolIds: contextualToolIdsSchema,
   question: z.string().trim().min(1).max(1_200),
   history: z.array(questionHistoryMessageSchema).max(20).default([]),
+  priorScreenshotIds: z.array(z.string().trim().min(1).max(180)).max(10).default([]),
 });
 
 export const helpClipRequestSchema = z.object({
@@ -95,7 +96,7 @@ export const helpClipRequestSchema = z.object({
   toolIds: selectedToolIdsSchema,
   lessonPlanId: z.string().trim().min(1).max(160),
   supportTopicId: z.string().trim().min(1).max(160),
-  guidanceToken: z.string().min(1).max(5_000),
+  guidanceToken: z.string().min(1).max(20_000),
   question: z.string().trim().max(1_200).optional(),
 });
 

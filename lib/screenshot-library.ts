@@ -14,6 +14,13 @@ const screenshotAssetSchema = z.object({
   keywords: z.array(z.string().min(1)),
   referenceDescription: z.string().min(1),
   sharedControls: z.string(),
+  transitions: z.array(
+    z.object({
+      action: z.string().min(1),
+      targetId: z.string().min(1),
+      verification: z.string().min(1),
+    }),
+  ).default([]),
   originalUrl: z.string().startsWith("/assets/screenshots/"),
   thumbnailUrl: z.string().startsWith("/assets/screenshots/"),
   width: z.number().int().positive(),
@@ -61,6 +68,37 @@ export const getScreenshotAsset = (
 ): ScreenshotAsset | undefined =>
   getScreenshotLibrary().find((asset) => asset.id === assetId);
 
+export const followsConfirmedScreenshotPaths = (
+  assetIds: readonly (string | null | undefined)[],
+): boolean => {
+  const completedTools = new Set<ToolId>();
+  let currentTool: ToolId | undefined;
+  return assetIds.every((assetId, index) => {
+    const asset = getScreenshotAsset(assetId);
+    if (!asset) {
+      return false;
+    }
+    if (asset.toolId !== currentTool) {
+      if (completedTools.has(asset.toolId)) {
+        return false;
+      }
+      if (currentTool) {
+        completedTools.add(currentTool);
+      }
+      currentTool = asset.toolId;
+    }
+    const nextAssetId = assetIds[index + 1];
+    const nextAsset = getScreenshotAsset(nextAssetId);
+    return (
+      !nextAssetId ||
+      (nextAsset && nextAsset.toolId !== asset.toolId) ||
+      asset.transitions.some(
+        (transition) => transition.targetId === nextAssetId,
+      )
+    );
+  });
+};
+
 export const getThumbnailDataUrl = (asset: ScreenshotAsset): string =>
   `data:image/jpeg;base64,${readFileSync(publicFilePath(asset.thumbnailUrl)).toString("base64")}`;
 
@@ -71,6 +109,9 @@ export const getScreenshotKeywordIndex = (
     .map(
       (asset) =>
         `- ${asset.id} | tool=${asset.toolId} | website=${asset.website} | ` +
-        `reference=${asset.referenceDescription} | keywords=${asset.keywords.join(", ")}`,
+        `reference=${asset.referenceDescription} | ` +
+        `confirmedNext=${asset.transitions.length > 0
+          ? asset.transitions.map((transition) => `${transition.action} -> ${transition.targetId}`).join("; ")
+          : "none"} | keywords=${asset.keywords.join(", ")}`,
     )
     .join("\n");

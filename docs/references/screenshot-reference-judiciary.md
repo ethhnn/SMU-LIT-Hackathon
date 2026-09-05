@@ -60,7 +60,52 @@ All six Find a Hearing captures use the same search form unless the crop exclude
 | `judiciary-sheriffs-sales-vessel-tab.png` | Same sales interface with **Vessel** selected; **Immovable Property** and **Movable Property** are alternate tabs. Vessel-sale entries/title links open details. |
 | `judiciary-who-we-are-directory.png` | Who We Are directory with cards/title links to the Judiciary’s structure, leadership, courts, boards, or related institutional information. Shared header search, feedback tab, share actions, and Back to top are visible. |
 
+## Confirmed screenshot paths
+
+These paths were checked against the live Judiciary.gov.sg site on 6 September 2026. Same-page rows describe an accordion, tab, or scroll state; cross-page rows use the actual linked destination shown by the live site.
+
+| From image | Visible action that produces the next state | To image | Live verification |
+| --- | --- | --- | --- |
+| `judiciary-homepage-overview.png` | Expand **Manage my court case**. | `judiciary-homepage-manage-my-court-case-menu-expanded.png` | Same `/` homepage accordion |
+| `judiciary-homepage-overview.png` | Expand **Start a court case**. | `judiciary-homepage-start-a-court-case-menu-expanded.png` | Same `/` homepage accordion |
+| `judiciary-homepage-overview.png` | Expand **Understand what the law can do for you**. | `judiciary-homepage-understand-the-law-menu-expanded.png` | Same `/` homepage accordion |
+| `judiciary-homepage-overview.png` | Expand **Learn about the courts**. | `judiciary-homepage-learn-about-the-courts-menu-expanded.png` | Same `/` homepage accordion |
+| `judiciary-homepage-overview.png` | Open **Self-help guides** in the header. | `judiciary-self-help-guides-menu-expanded.png` | Same page header mega-menu |
+| `judiciary-homepage-overview.png` | Select **Who we are** in the header. | `judiciary-who-we-are-directory.png` | `/` → `/who-we-are` |
+| `judiciary-homepage-overview.png` | Select **Discover the courts** in the header. | `judiciary-discover-the-courts-introduction-video.png` | `/` → `/discover-the-courts` |
+| `judiciary-homepage-overview.png` | Select **Judgments** in the header. | `judiciary-judgments-overview.png` | `/` → `/judgments` |
+| `judiciary-homepage-overview.png` | Select **News and Resources** in the header. | `judiciary-news-and-resources-directory.png` | `/` → `/news-and-resources` |
+| `judiciary-homepage-overview.png` | Select **Services** in the header. | `judiciary-services-overview.png` | `/` → `/services` |
+| `judiciary-homepage-overview.png` | Select **Contact** in the header. | `judiciary-contact-us-popular-enquiries.png` | `/` → `/contact-us` |
+| `judiciary-homepage-overview.png` | Scroll down to **Latest news**. | `judiciary-homepage-latest-news.png` | Same `/` homepage |
+| `judiciary-homepage-learn-about-the-courts-menu-expanded.png` | Select **Discover what the courts are all about**. | `judiciary-discover-the-courts-introduction-video.png` | `/` → `/discover-the-courts` |
+| `judiciary-homepage-manage-my-court-case-menu-expanded.png` | Select **E-Platforms**. | `judiciary-e-platforms-overview.png` | `/` → `/services/e-platforms` |
+| `judiciary-services-overview.png` | Select **Court services**. | `judiciary-court-services-overview.png` | `/services` → `/services/court-services` |
+| `judiciary-services-overview.png` | Select **E-Platforms**. | `judiciary-e-platforms-overview.png` | `/services` → `/services/e-platforms` |
+| `judiciary-services-overview.png` | Select **Sheriff's sales and services**. | `judiciary-sheriffs-sales-and-services-overview.png` | `/services` → `/services/sheriff-sales-services` |
+| `judiciary-court-services-overview.png` | Scroll down through the Court services directory. | `judiciary-court-services-directory-lower-section.png` | Same `/services/court-services` page |
+| `judiciary-e-platforms-overview.png` | Scroll down through the e-Platforms directory. | `judiciary-e-platforms-directory-lower-section.png` | Same `/services/e-platforms` page |
+| `judiciary-sheriffs-sales-and-services-overview.png` | Continue into the Sheriff's sales and services directory. | `judiciary-sheriffs-sales-and-services-directory.png` | Same `/services/sheriff-sales-services` area |
+| `judiciary-sheriffs-sales-and-services-directory.png` | Select **Sheriff's sales**. | `judiciary-sheriffs-sales-movable-property-tab.png` | `/services/sheriff-sales-services` → Sheriff's sales listing |
+| `judiciary-sheriffs-sales-movable-property-tab.png` | Select **Immovable Property**. | `judiciary-sheriffs-sales-immovable-property-tab.png` | Same Sheriff's sales tab set |
+| `judiciary-sheriffs-sales-movable-property-tab.png` | Select **Vessel**. | `judiciary-sheriffs-sales-vessel-tab.png` | Same Sheriff's sales tab set |
+| `judiciary-sheriffs-sales-immovable-property-tab.png` | Select **Movable Property**. | `judiciary-sheriffs-sales-movable-property-tab.png` | Same Sheriff's sales tab set |
+| `judiciary-sheriffs-sales-immovable-property-tab.png` | Select **Vessel**. | `judiciary-sheriffs-sales-vessel-tab.png` | Same Sheriff's sales tab set |
+| `judiciary-sheriffs-sales-vessel-tab.png` | Select **Movable Property**. | `judiciary-sheriffs-sales-movable-property-tab.png` | Same Sheriff's sales tab set |
+| `judiciary-sheriffs-sales-vessel-tab.png` | Select **Immovable Property**. | `judiciary-sheriffs-sales-immovable-property-tab.png` | Same Sheriff's sales tab set |
+| `judiciary-contact-us-popular-enquiries.png` | Scroll down to **Get in touch**. | `judiciary-contact-us-get-in-touch.png` | Same `/contact-us` page; live heading order confirmed |
+| `judiciary-contact-us-get-in-touch.png` | Continue scrolling to **Write to us** and visitor information. | `judiciary-contact-us-write-to-us-and-visitor-information.png` | Same `/contact-us` page; live heading order confirmed |
+| `judiciary-discover-the-courts-mission-and-courts-in-action.png` | Scroll down to court news and workload statistics. | `judiciary-discover-the-courts-news-and-workload-statistics.png` | Same `/discover-the-courts` page; live heading order confirmed |
+| `judiciary-discover-the-courts-news-and-workload-statistics.png` | Continue scrolling to values and community content. | `judiciary-discover-the-courts-values-and-community.png` | Same `/discover-the-courts` page; live heading order confirmed |
+| `judiciary-discover-the-courts-values-and-community.png` | Continue scrolling to people and visitor information. | `judiciary-discover-the-courts-people-and-visitor-information.png` | Same `/discover-the-courts` page; live heading order confirmed |
+| `judiciary-find-a-hearing-court-filter-expanded.png` | Select the **Law firm** filter. | `judiciary-find-a-hearing-law-firm-filter-expanded.png` | Same `/hearing-list` filter form |
+| `judiciary-find-a-hearing-law-firm-filter-expanded.png` | Select the **Judge/Judicial officer** filter. | `judiciary-find-a-hearing-judicial-officer-filter-expanded.png` | Same `/hearing-list` filter form |
+| `judiciary-find-a-hearing-judicial-officer-filter-expanded.png` | Select the **Hearing Type** filter. | `judiciary-find-a-hearing-hearing-type-filter-expanded.png` | Same `/hearing-list` filter form |
+| `judiciary-find-a-hearing-hearing-type-filter-expanded.png` | Select the **Date** filter. | `judiciary-find-a-hearing-date-picker-expanded.png` | Same `/hearing-list` filter form |
+| `judiciary-admiralty-actions-arrest-of-vessels.png` | Scroll down to security-service providers and vessel agents. | `judiciary-admiralty-actions-security-services-and-vessel-agents.png` | Same `/services/sheriff-services-admiralty-actions` page |
+| `judiciary-admiralty-actions-security-services-and-vessel-agents.png` | Continue scrolling to vessel appraisers, shipbrokers, and sale proceeds. | `judiciary-admiralty-actions-vessel-appraisers-shipbrokers-and-sale-proceeds.png` | Same Admiralty Actions page |
+| `judiciary-admiralty-actions-vessel-appraisers-shipbrokers-and-sale-proceeds.png` | Continue scrolling to resources and FAQs. | `judiciary-admiralty-actions-resources-and-faqs.png` | Same Admiralty Actions page |
+
 ## Runtime note
 
-These 38 images are retained as source assets but are not yet included in the runtime screenshot manifest, tool catalogue, or tutorial coverage.
-
+All 38 images are included in the runtime screenshot manifest under the `judiciary` tool ID. Their descriptions and confirmed paths support screenshot-observation guidance; they do not by themselves establish a manually rehearsed workflow.

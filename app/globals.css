@@ -346,10 +346,100 @@ textarea {
   margin: 0.8rem 0 0;
 }
 
+.generation-progress {
+  display: grid;
+  gap: 0.65rem;
+  width: 100%;
+  margin: 0.85rem 0;
+}
+
+.generation-progress-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 1rem;
+  color: #385169;
+}
+
+.generation-progress-copy strong {
+  color: var(--blue-dark);
+}
+
+.generation-progress-copy span {
+  font-size: 0.9rem;
+}
+
+.generation-progress-track {
+  position: relative;
+  height: 0.65rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dbe8f2;
+}
+
+.generation-progress-bar {
+  position: absolute;
+  inset-block: 0;
+  left: -38%;
+  width: 38%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), #42bad2);
+  animation: generation-progress 1.2s ease-in-out infinite;
+}
+
+@keyframes generation-progress {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(365%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .generation-progress-bar {
+    left: 0;
+    width: 72%;
+    animation: none;
+  }
+}
+
 .screenshot-teaching {
   display: grid;
   gap: 1rem;
   margin: 1rem 0;
+}
+
+.screenshot-tool-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.65rem;
+}
+
+.screenshot-tool-tabs button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f5f8fb;
+  color: var(--blue-dark);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 0.55rem 0.85rem;
+}
+
+.screenshot-tool-tabs button.active {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+}
+
+.screenshot-tool-tabs + [role="tabpanel"] {
+  display: grid;
+  gap: 1rem;
 }
 
 .teaching-item {

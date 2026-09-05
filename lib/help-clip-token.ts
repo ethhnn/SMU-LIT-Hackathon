@@ -21,6 +21,7 @@ export type HelpClipTokenPayload = {
   toolSelectionHash: string;
   questionHash: string;
   dynamicScene?: DynamicScreenshotScene;
+  dynamicScenes?: DynamicScreenshotScene[];
 };
 
 const encode = (value: string): string => Buffer.from(value).toString("base64url");
@@ -46,6 +47,7 @@ export const issueHelpClipToken = ({
   toolIds,
   question,
   dynamicScene,
+  dynamicScenes,
 }: {
   scenario: string;
   lessonPlanId: string;
@@ -53,6 +55,7 @@ export const issueHelpClipToken = ({
   toolIds: readonly string[];
   question?: string;
   dynamicScene?: DynamicScreenshotScene;
+  dynamicScenes?: DynamicScreenshotScene[];
 }): string => {
   const payload: HelpClipTokenPayload = {
     lessonPlanId,
@@ -62,6 +65,7 @@ export const issueHelpClipToken = ({
     toolSelectionHash: toolSelectionHash(toolIds),
     questionHash: questionHash(question),
     dynamicScene,
+    dynamicScenes,
   };
   const encodedPayload = encode(JSON.stringify(payload));
   return `${encodedPayload}.${sign(encodedPayload)}`;

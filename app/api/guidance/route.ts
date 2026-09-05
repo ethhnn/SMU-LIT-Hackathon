@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     }
     const toolIds = parsed.data.toolIds.filter(isToolId);
 
-    const { response: guidance, dynamicScene } = await getSharedGuidance({
+    const { response: guidance, dynamicScenes } = await getSharedGuidance({
       ...parsed.data,
       toolIds,
     });
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
             lessonPlanId: guidance.lessonPlanId,
             supportTopicId: guidance.supportTopicId,
             toolIds,
-            dynamicScene,
+            dynamicScenes,
           })
         : undefined;
 

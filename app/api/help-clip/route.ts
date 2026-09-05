@@ -4,12 +4,17 @@ import { helpClipRequestSchema } from "@/lib/contracts";
 import { isToolId } from "@/lib/catalog";
 import { readValidHelpClipToken } from "@/lib/help-clip-token";
 import {
-  getLessonPlanForDynamicScene,
+  getLessonPlanForDynamicScenes,
   getLessonPlanForSupportTopic,
   selectionKey,
 } from "@/lib/lesson-plans";
 import { getSupportTopic } from "@/lib/support-topics";
 import { HelpClipError, createHelpClip } from "@/lib/video";
+import {
+  getDynamicLessonPlanId,
+  getDynamicSupportTopicId,
+} from "@/lib/dynamic-scene";
+import { followsConfirmedScreenshotPaths } from "@/lib/screenshot-library";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -48,22 +53,47 @@ export async function POST(request: Request) {
       );
     }
 
-    const lessonPlan = tokenPayload.dynamicScene
-      ? getLessonPlanForDynamicScene(
+    const dynamicScenes = tokenPayload.dynamicScenes ||
+      (tokenPayload.dynamicScene ? [tokenPayload.dynamicScene] : undefined);
+    const usesLegacyDynamicScene = Boolean(
+      tokenPayload.dynamicScene && !tokenPayload.dynamicScenes,
+    );
+    if (
+      dynamicScenes &&
+      !followsConfirmedScreenshotPaths(
+        dynamicScenes.map((scene) => scene.screenshotAssetId),
+      )
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Refresh contextual help because its screenshots do not follow a confirmed navigation path.",
+        },
+        { status: 400 },
+      );
+    }
+    const lessonPlan = dynamicScenes
+      ? getLessonPlanForDynamicScenes(
           parsed.data.lessonPlanId,
-          tokenPayload.dynamicScene,
+          dynamicScenes,
         )
       : getLessonPlanForSupportTopic(parsed.data.supportTopicId);
-    const supportTopic = tokenPayload.dynamicScene
+    const supportTopic = dynamicScenes
       ? undefined
       : getSupportTopic(parsed.data.supportTopicId);
     if (
       !lessonPlan ||
       lessonPlan.id !== parsed.data.lessonPlanId ||
-      (!tokenPayload.dynamicScene && supportTopic?.videoPlanId !== lessonPlan.id) ||
-      (tokenPayload.dynamicScene &&
-        parsed.data.supportTopicId !==
-          `screenshot:${tokenPayload.dynamicScene.screenshotAssetId}`) ||
+      (!dynamicScenes && supportTopic?.videoPlanId !== lessonPlan.id) ||
+      (dynamicScenes &&
+        (usesLegacyDynamicScene
+          ? dynamicScenes.length !== 1 ||
+            parsed.data.lessonPlanId !==
+              `contextual-${dynamicScenes[0].screenshotAssetId}` ||
+            parsed.data.supportTopicId !==
+              `screenshot:${dynamicScenes[0].screenshotAssetId}`
+          : parsed.data.lessonPlanId !== getDynamicLessonPlanId(dynamicScenes) ||
+            parsed.data.supportTopicId !== getDynamicSupportTopicId(dynamicScenes))) ||
       selectionKey(lessonPlan.toolIds) !== selectionKey(toolIds)
     ) {
       return NextResponse.json(

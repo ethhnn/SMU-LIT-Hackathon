@@ -68,8 +68,8 @@ _Avoid_: General screenshot catalog, hardcoded question answer
 A generated JSON inventory of every supplied screenshot, including its tool, filename-derived keywords, dimensions, full image path, and thumbnail path. OpenRouter searches this index before visually inspecting candidates.
 _Avoid_: Question-specific lookup table, proof that an interaction was tested
 
-**Dynamic Screenshot Scene**:
-A screenshot-observation scene produced after OpenRouter selects and visually inspects one indexed image. It contains the exact asset ID, image-grounded instruction, caption, and highlight and is carried only in a signed generation token.
+**Dynamic Screenshot Scene Sequence**:
+An ordered set of up to three screenshot-observation scenes produced after OpenRouter selects and visually inspects indexed images. Each scene contains its exact asset ID, image-grounded instruction, caption, and highlight. The sequence is carried only in a signed generation token. A broad objective may use an access scene followed by destination content, while a narrow question should remain a single scene.
 _Avoid_: Verified Action, model-invented asset path
 
 **Screenshot Guide**:

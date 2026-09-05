@@ -118,21 +118,36 @@ export const getLessonPlanForSupportTopic = (
 export const getLessonPlanForDynamicScene = (
   lessonPlanId: string,
   scene: DynamicScreenshotScene,
+): LessonPlan | undefined =>
+  getLessonPlanForDynamicScenes(lessonPlanId, [scene]);
+
+export const getLessonPlanForDynamicScenes = (
+  lessonPlanId: string,
+  scenes: readonly DynamicScreenshotScene[],
 ): LessonPlan | undefined => {
-  const asset = getScreenshotAsset(scene.screenshotAssetId);
+  // Screenshot selection allows up to three grounded scenes for each of the
+  // three selected tools. The combined video must accept that same complete
+  // set instead of applying the former three-scenes-total limit.
+  if (scenes.length === 0 || scenes.length > 9) {
+    return undefined;
+  }
+
+  const resolved = scenes.map((scene) => ({
+    scene,
+    asset: getScreenshotAsset(scene.screenshotAssetId),
+  }));
   if (
-    !asset ||
-    asset.toolId !== scene.toolId ||
-    lessonPlanId !== `contextual-${asset.id}`
+    resolved.some(({ scene, asset }) => !asset || asset.toolId !== scene.toolId)
   ) {
     return undefined;
   }
 
   return {
     id: lessonPlanId,
-    toolIds: [scene.toolId],
-    scenes: [
-      {
+    toolIds: [...new Set(scenes.map((scene) => scene.toolId))],
+    scenes: resolved.map(({ scene, asset }) => {
+      if (!asset) throw new Error("Dynamic screenshot asset was not resolved.");
+      return {
         toolId: scene.toolId,
         toolName: scene.toolName,
         actionId: asset.id,
@@ -148,8 +163,8 @@ export const getLessonPlanForDynamicScene = (
           y: scene.highlight.y + scene.highlight.height / 2,
         },
         evidenceStatus: "screenshot-observation",
-      },
-    ],
+      };
+    }),
   };
 };
 

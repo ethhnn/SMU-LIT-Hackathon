@@ -64,6 +64,12 @@ const normalizeReferenceText = (value) =>
     .replace(/\s+/g, " ")
     .trim();
 
+const slugForFilename = (filename) =>
+  basename(filename, extname(filename))
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
 const readScreenshotReference = (referencePath) => {
   if (!existsSync(referencePath)) {
     throw new Error(`Screenshot reference is missing: ${referencePath}`);
@@ -84,7 +90,8 @@ const readScreenshotReference = (referencePath) => {
       )
     : "";
   const entries = new Map();
-  const tableRow = /^\|\s*`([^`]+\.png)`\s*\|\s*(.*?)\s*\|\s*$/gm;
+  const paths = [];
+  const tableRow = /^\|[ \t]*`([^`]+\.png)`[ \t]*\|[ \t]*([^|]*?)[ \t]*\|[ \t]*$/gm;
 
   for (const match of markdown.matchAll(tableRow)) {
     const filename = match[1];
@@ -96,7 +103,23 @@ const readScreenshotReference = (referencePath) => {
   if (entries.size === 0) {
     throw new Error(`Screenshot reference contains no image rows: ${referencePath}`);
   }
-  return { entries, sharedControls };
+  const pathsHeading = markdown.indexOf("## Confirmed screenshot paths");
+  const nextHeading = pathsHeading >= 0
+    ? markdown.indexOf("\n## ", pathsHeading + 4)
+    : -1;
+  const pathsSection = pathsHeading >= 0
+    ? markdown.slice(pathsHeading, nextHeading >= 0 ? nextHeading : undefined)
+    : "";
+  const pathRow = /^\|[ \t]*`([^`]+\.png)`[ \t]*\|[ \t]*(.*?)[ \t]*\|[ \t]*`([^`]+\.png)`[ \t]*\|[ \t]*(.*?)[ \t]*\|[ \t]*$/gm;
+  for (const match of pathsSection.matchAll(pathRow)) {
+    paths.push({
+      fromFilename: match[1],
+      action: normalizeReferenceText(match[2]),
+      toFilename: match[3],
+      verification: normalizeReferenceText(match[4]),
+    });
+  }
+  return { entries, paths, sharedControls };
 };
 
 const searchableWords = (value) =>
@@ -152,6 +175,29 @@ for (const source of sources) {
         `Unknown: ${unknownReferences.join(", ") || "none"}.`,
     );
   }
+  const invalidPaths = reference.paths.filter(
+    (path) =>
+      !sourceFilenameSet.has(path.fromFilename) ||
+      !sourceFilenameSet.has(path.toFilename) ||
+      !path.action,
+  );
+  if (invalidPaths.length > 0) {
+    throw new Error(
+      `Screenshot path mismatch for ${source.toolId}: ${invalidPaths
+        .map((path) => `${path.fromFilename} -> ${path.toFilename}`)
+        .join(", ")}.`,
+    );
+  }
+  const pathsBySource = new Map();
+  for (const pathEntry of reference.paths) {
+    const existing = pathsBySource.get(pathEntry.fromFilename) || [];
+    existing.push({
+      action: pathEntry.action,
+      targetId: `${source.toolId}-${slugForFilename(pathEntry.toFilename)}`,
+      verification: pathEntry.verification,
+    });
+    pathsBySource.set(pathEntry.fromFilename, existing);
+  }
 
   for (const entry of readdirSync(source.directory, { withFileTypes: true })) {
     if (!entry.isFile() || extname(entry.name).toLowerCase() !== ".png") {
@@ -159,10 +205,7 @@ for (const source of sources) {
     }
 
     const sourcePath = resolve(source.directory, entry.name);
-    const slug = basename(entry.name, extname(entry.name))
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    const slug = slugForFilename(entry.name);
     const id = `${source.toolId}-${slug}`;
     const originalPath = resolve(publicRoot, source.toolId, "original", entry.name);
     const thumbnailName = `${slug}.jpg`;
@@ -225,6 +268,7 @@ for (const source of sources) {
       keywords,
       referenceDescription,
       sharedControls: reference.sharedControls,
+      transitions: pathsBySource.get(entry.name) || [],
       originalUrl: `/assets/screenshots/${source.toolId}/original/${entry.name}`,
       thumbnailUrl: `/assets/screenshots/${source.toolId}/thumbnail/${thumbnailName}`,
       width: dimensions.width,
@@ -237,6 +281,7 @@ for (const source of sources) {
       filename: entry.name,
       referenceDescription,
       sharedControls: reference.sharedControls,
+      transitions: pathsBySource.get(entry.name) || [],
     });
   }
 }
@@ -253,13 +298,14 @@ writeFileSync(
 writeFileSync(
   resolve(publicRoot, "image-keywords.json"),
   `${JSON.stringify(
-    manifest.map(({ id, toolId, website, filename, keywords, referenceDescription }) => ({
+    manifest.map(({ id, toolId, website, filename, keywords, referenceDescription, transitions }) => ({
       id,
       toolId,
       website,
       filename,
       keywords,
       referenceDescription,
+      transitions,
     })),
     null,
     2,

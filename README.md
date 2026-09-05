@@ -4,7 +4,7 @@ This hackathon MVP helps a lawyer learn how to operate a relevant technology for
 
 The learner writes a free-text objective or selects a sample. An OpenRouter-routed model recommends relevant technologies from a curated catalog, with intended uses, pros, limits, and tutorial coverage. The learner checks one or more recommended tools for a shared Help Clip and can continue with contextual teaching questions about that selected set.
 
-The active asset library contains 27 LawNet screenshots, 21 TAFEP screenshots, and 38 Judiciary.gov.sg screenshots. Asset preparation validates these images against the human-reviewed files in [`docs/references/`](docs/references/), then generates searchable metadata containing the correct website/product identity, visible controls, filters, and captured state. OpenRouter uses that metadata both to shortlist images and to interpret the selected screenshot. These images support labelled screenshot-observation clips; the separately reviewed OpenLaw workflow coverage remains limited to locating the Search field. Litera Compare and iManage receive high-level text only until screenshots are supplied.
+The active asset library contains 27 LawNet screenshots, 21 TAFEP screenshots, and 38 Judiciary.gov.sg screenshots. Asset preparation validates these images against the human-reviewed files in [`docs/references/`](docs/references/), then generates searchable metadata containing the correct website/product identity, visible controls, filters, captured state, and confirmed screenshot-to-screenshot paths. OpenRouter uses that metadata both to shortlist images and to interpret the selected screenshot. Screenshot Guides and generated videos reject disconnected scene sequences and use the reviewed path action between valid scenes. These images support labelled screenshot-observation clips; the separately reviewed OpenLaw workflow coverage remains limited to locating the Search field. Litera Compare and iManage receive high-level text only until screenshots are supplied.
 
 The running catalogue includes OpenLaw, TAFEP, Judiciary.gov.sg / SG Courts, Litera Compare, and iManage. Judiciary has screenshot-observation coverage but no manually rehearsed workflow. Collecting and describing screenshots does not by itself establish reviewed tutorial coverage.
 
@@ -16,9 +16,9 @@ Free-text training objective
   → Curated tool recommendations
   → Checkbox selection for a shared Help Clip
   → Validated human-reviewed screenshot reference index
-  → OpenRouter shortlist + visual screenshot selection
+  → OpenRouter shortlist + ordered visual screenshot selection
   → Shared contextual guidance and Help Focus
-  → Explicit Generate shared Help Clip request for a grounded scene
+  → Explicit Generate shared Help Clip request for grounded scenes
   → OpenRouter supporting-style selection and TTS
   → Remotion animation + FFmpeg MP4 processing
   → Playable “Training demonstration” MP4
@@ -60,7 +60,7 @@ The selected public training target and exact asset status live in [docs/openlaw
 - **Ready:** the starting OpenLaw judgments screen and the reviewed instruction to locate the Search field.
 - **Pending manual capture and rehearsal:** populated search, submitted results, and opened matching judgment.
 
-The app labels screenshot observations separately from reviewed actions. A single supplied image may produce a screenshot-based clip after multimodal selection. Do not represent the four-step judgment-location workflow or any multi-tool clip as verified until the remaining materials are captured, reviewed, and rehearsed.
+The app labels screenshot observations separately from reviewed actions. One to three supplied images may produce a screenshot-based clip after multimodal selection. Broad objectives can use an access scene followed by destination-page scenes; narrow questions should keep the sequence minimal. Do not represent the four-step judgment-location workflow or an unreviewed cross-tool handoff as verified until the remaining materials are captured, reviewed, and rehearsed.
 
 ## Screenshot inventory
 
@@ -76,7 +76,7 @@ Judiciary captures include homepage menus, hearing-search filters, judgments, co
 
 ## Known issues and handover
 
-The [screenshot-guidance handover](docs/handovers/2026-09-05-screenshot-guidance.md) records reproduced oversized highlights, wrong-page contextual answers, and the requested move to page-specific metadata and multi-screenshot explanations. Its evidence reflects the pre-merge 36-image library. These issues remain open; merging the expanded screenshot collections does not fix them.
+The [screenshot-guidance handover](docs/handovers/2026-09-05-screenshot-guidance.md) records the original oversized highlights, wrong-page contextual answers, and single-screenshot limitation. Page-specific references, current-question retrieval priority, prior-image context, and ordered multi-screenshot explanations are now implemented. Highlight quality remains model-dependent and should still be inspected during the real-media check.
 
 ## Project source of truth
 

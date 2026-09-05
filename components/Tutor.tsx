@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 
 import type { ToolId } from "@/lib/catalog";
 import type {
@@ -49,14 +49,83 @@ const postJson = async <T,>(url: string, payload: unknown): Promise<T> => {
   return data;
 };
 
+const GenerationProgress = ({
+  label,
+  detail,
+}: {
+  label: string;
+  detail: string;
+}) => (
+  <div className="generation-progress" role="status" aria-live="polite">
+    <div className="generation-progress-copy">
+      <strong>{label}</strong>
+      <span>{detail}</span>
+    </div>
+    <div
+      className="generation-progress-track"
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      <span className="generation-progress-bar" />
+    </div>
+  </div>
+);
+
 const ScreenshotTeaching = ({ items }: { items: ScreenshotGuide[] }) => {
+  const toolGroups = items.reduce<Array<{
+    toolId: ToolId;
+    toolName: string;
+    items: ScreenshotGuide[];
+  }>>((groups, item) => {
+    const existing = groups.find((group) => group.toolId === item.toolId);
+    if (existing) {
+      existing.items.push(item);
+    } else {
+      groups.push({
+        toolId: item.toolId,
+        toolName: item.toolName,
+        items: [item],
+      });
+    }
+    return groups;
+  }, []);
+  const [selectedToolTab, setSelectedToolTab] = useState<ToolId | undefined>(
+    toolGroups[0]?.toolId,
+  );
   if (items.length === 0) {
     return null;
   }
+  const activeGroup =
+    toolGroups.find((group) => group.toolId === selectedToolTab) || toolGroups[0];
 
   return (
     <div className="screenshot-teaching">
-      {items.map((item) => (
+      {toolGroups.length > 1 ? (
+        <div className="screenshot-tool-tabs" role="tablist" aria-label="Screenshot guides by tool">
+          {toolGroups.map((group) => (
+            <button
+              aria-controls={`screenshot-panel-${group.toolId}`}
+              aria-selected={activeGroup.toolId === group.toolId}
+              className={activeGroup.toolId === group.toolId ? "active" : undefined}
+              id={`screenshot-tab-${group.toolId}`}
+              key={group.toolId}
+              onClick={() => setSelectedToolTab(group.toolId)}
+              role="tab"
+              type="button"
+            >
+              {group.toolName} ({Math.min(group.items.length, 3)})
+            </button>
+          ))}
+        </div>
+      ) : null}
+      <div
+        aria-labelledby={toolGroups.length > 1 ? `screenshot-tab-${activeGroup.toolId}` : undefined}
+        id={`screenshot-panel-${activeGroup.toolId}`}
+        role={toolGroups.length > 1 ? "tabpanel" : undefined}
+      >
+      {activeGroup.items.slice(0, 3).map((item) => (
         <section className="teaching-item" key={item.id}>
           <div className="teaching-heading">
             <div>
@@ -90,15 +159,12 @@ const ScreenshotTeaching = ({ items }: { items: ScreenshotGuide[] }) => {
             <figcaption>{item.caption}</figcaption>
           </figure>
           <p className="expected-result">
-            <strong>
-              {item.evidenceStatus === "reviewed-instruction"
-                ? "What this establishes:"
-                : "What this screenshot shows:"}
-            </strong>{" "}
+            <strong>Expected result:</strong>{" "}
             {item.expectedResult}
           </p>
         </section>
       ))}
+      </div>
     </div>
   );
 };
@@ -135,8 +201,10 @@ export const Tutor = () => {
   const [isRecommending, setIsRecommending] = useState(false);
   const [isGuiding, setIsGuiding] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const guidanceRequestId = useRef(0);
 
   const resetComposer = () => {
+    guidanceRequestId.current += 1;
     setSelectedToolIds([]);
     setGuidance(null);
     setQuestion("");
@@ -145,6 +213,7 @@ export const Tutor = () => {
     setFailedQuestion("");
     setQuestionError("");
     setClip(null);
+    setIsGuiding(false);
   };
 
   const requestGuidance = async (toolIds: ToolId[]) => {
@@ -152,23 +221,32 @@ export const Tutor = () => {
       return;
     }
 
+    const requestId = ++guidanceRequestId.current;
     setError("");
+    setGuidance(null);
+    setClip(null);
     setIsGuiding(true);
     try {
       const result = await postJson<SharedGuidanceResponse>("/api/guidance", {
         scenario: activeScenario,
         toolIds,
       });
-      setGuidance(result);
+      if (requestId === guidanceRequestId.current) {
+        setGuidance(result);
+      }
     } catch (requestError) {
-      setGuidance(null);
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "Shared contextual help is unavailable right now.",
-      );
+      if (requestId === guidanceRequestId.current) {
+        setGuidance(null);
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Shared contextual help is unavailable right now.",
+        );
+      }
     } finally {
-      setIsGuiding(false);
+      if (requestId === guidanceRequestId.current) {
+        setIsGuiding(false);
+      }
     }
   };
 
@@ -237,6 +315,9 @@ export const Tutor = () => {
     setError("");
     if (nextToolIds.length > 0) {
       void requestGuidance(nextToolIds);
+    } else {
+      guidanceRequestId.current += 1;
+      setIsGuiding(false);
     }
   };
 
@@ -260,6 +341,15 @@ export const Tutor = () => {
     );
   };
 
+  const priorScreenshotIds = (): string[] => {
+    const ids = [
+      ...(guidance?.teachingItems ?? []),
+      ...contextualTurns.flatMap((turn) => turn.teachingItems),
+    ].flatMap((item) => (item.screenshotAssetId ? [item.screenshotAssetId] : []));
+
+    return [...new Set(ids)].slice(-10);
+  };
+
   const requestContextualAnswer = async (questionText: string) => {
     const trimmed = questionText.trim();
     if (!trimmed || !activeScenario || pendingQuestion) {
@@ -278,6 +368,7 @@ export const Tutor = () => {
           toolIds: contextualToolIds(),
           question: trimmed,
           history: questionHistory(),
+          priorScreenshotIds: priorScreenshotIds(),
         },
       );
       setContextualTurns((turns) => [...turns, result]);
@@ -310,6 +401,7 @@ export const Tutor = () => {
     }
 
     setError("");
+    setClip(null);
     setIsGenerating(true);
     try {
       const result = await postJson<HelpClipResponse>("/api/help-clip", {
@@ -346,7 +438,11 @@ export const Tutor = () => {
       return;
     }
 
-    updateTurn(turn.turnId, { isGenerating: true, clipError: undefined });
+    updateTurn(turn.turnId, {
+      isGenerating: true,
+      clip: undefined,
+      clipError: undefined,
+    });
     try {
       const result = await postJson<HelpClipResponse>("/api/help-clip", {
         scenario: activeScenario,
@@ -519,30 +615,46 @@ export const Tutor = () => {
             ))}
           </div>
           <div className="shared-guidance" aria-live="polite">
-            {isGuiding ? <p>Preparing screenshot teaching and checking video coverage…</p> : null}
-            {guidance ? <p>{guidance.message}</p> : null}
-            {guidance?.missingCoverage.length ? (
+            {isGuiding ? (
+              <GenerationProgress
+                label="Generating screenshot guides"
+                detail="Selecting, ordering, and validating every screenshot before display."
+              />
+            ) : null}
+            {!isGuiding && guidance ? <p>{guidance.message}</p> : null}
+            {!isGuiding && guidance?.missingCoverage.length ? (
               <ul className="coverage-limit">
                 {guidance.missingCoverage.map((item) => <li key={item}>{item}</li>)}
               </ul>
             ) : null}
           </div>
 
-          {guidance ? <ScreenshotTeaching items={guidance.teachingItems} /> : null}
+          {!isGuiding && guidance ? (
+            <ScreenshotTeaching items={guidance.teachingItems} />
+          ) : null}
 
-          <button
-            type="button"
-            onClick={generateInitialHelpClip}
-            disabled={!guidance?.canGenerateHelpClip || isGenerating}
-          >
-            {isGenerating
-              ? "Generating shared Help Clip…"
-              : guidance?.canGenerateHelpClip
-                ? "Generate shared Help Clip"
-                : "Shared Help Clip coverage pending"}
-          </button>
+          {!isGuiding && guidance ? (
+            <button
+              type="button"
+              onClick={generateInitialHelpClip}
+              disabled={!guidance.canGenerateHelpClip || isGenerating}
+            >
+              {isGenerating
+                ? "Generating shared Help Clip…"
+                : guidance.canGenerateHelpClip
+                  ? "Generate shared Help Clip"
+                  : "Shared Help Clip coverage pending"}
+            </button>
+          ) : null}
 
-          {clip ? <ClipResult clip={clip} /> : null}
+          {isGenerating ? (
+            <GenerationProgress
+              label="Generating shared Help Clip"
+              detail="Creating narration and rendering all validated scenes into one video."
+            />
+          ) : null}
+
+          {!isGenerating && clip ? <ClipResult clip={clip} /> : null}
         </section>
       ) : null}
 
@@ -592,6 +704,12 @@ export const Tutor = () => {
                           ? "Generate Help Clip for this answer"
                           : "Video coverage not available for this answer"}
                     </button>
+                    {turn.isGenerating ? (
+                      <GenerationProgress
+                        label="Generating Help Clip"
+                        detail="Creating narration and rendering this answer's validated scenes."
+                      />
+                    ) : null}
                     {turn.clipError ? (
                       <div className="inline-error" role="alert">
                         {turn.clipError}
@@ -604,7 +722,7 @@ export const Tutor = () => {
                         </button>
                       </div>
                     ) : null}
-                    {turn.clip ? <ClipResult clip={turn.clip} /> : null}
+                    {!turn.isGenerating && turn.clip ? <ClipResult clip={turn.clip} /> : null}
                   </div>
                 </article>
               ))}
@@ -617,7 +735,10 @@ export const Tutor = () => {
                   </div>
                   <div className="chat-message tutor-message">
                     <span>Tutor</span>
-                    <p>Preparing an answer…</p>
+                    <GenerationProgress
+                      label="Generating screenshot guides"
+                      detail="Preparing the answer and validating all relevant screenshots before display."
+                    />
                   </div>
                 </article>
               ) : null}

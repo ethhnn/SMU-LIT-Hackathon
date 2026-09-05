@@ -3,7 +3,10 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { getScreenshotLibrary } from "@/lib/screenshot-library";
+import {
+  followsConfirmedScreenshotPaths,
+  getScreenshotLibrary,
+} from "@/lib/screenshot-library";
 
 describe("generated screenshot index", () => {
   it("contains every supplied PNG with human-reviewed reference metadata", () => {
@@ -38,6 +41,25 @@ describe("generated screenshot index", () => {
       true,
     );
     expect(library.every((asset) => asset.sharedControls.length > 0)).toBe(true);
+    const ids = new Set(library.map((asset) => asset.id));
+    expect(
+      library.every((asset) =>
+        asset.transitions.every((transition) => ids.has(transition.targetId)),
+      ),
+    ).toBe(true);
+  });
+
+  it("preserves confirmed navigation paths from the reference Markdown", () => {
+    const library = getScreenshotLibrary();
+    const homepage = library.find(
+      (asset) => asset.filename === "tafep-homepage-workplace-fairness-act.png",
+    );
+
+    expect(homepage?.transitions).toContainEqual({
+      action: "Select Workplace Fairness in the header.",
+      targetId: "tafep-tafep-workplace-fairness-overview",
+      verification: "/tafep → /tafep/workplace-fairness",
+    });
   });
 
   it("preserves the actual LawNet-family product identity", () => {
@@ -52,5 +74,22 @@ describe("generated screenshot index", () => {
           asset.filename === "lawnet-openlaw-judgments-sort-menu.png",
       )?.website,
     ).toBe("OpenLaw");
+  });
+
+  it("treats each tool as a separate connected route", () => {
+    expect(
+      followsConfirmedScreenshotPaths([
+        "tafep-tafep-homepage-workplace-fairness-act",
+        "tafep-tafep-workplace-fairness-overview",
+        "openlaw-lawnet-openlaw-judgments-expanded-sidebar",
+      ]),
+    ).toBe(true);
+    expect(
+      followsConfirmedScreenshotPaths([
+        "tafep-tafep-homepage-workplace-fairness-act",
+        "openlaw-lawnet-openlaw-judgments-expanded-sidebar",
+        "tafep-tafep-workplace-fairness-overview",
+      ]),
+    ).toBe(false);
   });
 });

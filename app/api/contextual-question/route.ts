@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       );
     }
     const toolIds = parsed.data.toolIds.filter(isToolId);
-    const { response: result, dynamicScene } = await answerContextualQuestion({
+    const { response: result, dynamicScenes } = await answerContextualQuestion({
       ...parsed.data,
       toolIds,
       history: parsed.data.history.slice(-getContextualHistoryMessageLimit()),
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
             supportTopicId: result.supportTopicId,
             toolIds: result.resolvedToolIds,
             question: parsed.data.question,
-            dynamicScene,
+            dynamicScenes,
           })
         : undefined;
 

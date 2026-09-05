@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -6,6 +6,7 @@ import { Tutor } from "@/components/Tutor";
 import { TOOL_CATALOG } from "@/lib/catalog";
 
 const openlaw = TOOL_CATALOG.find((tool) => tool.id === "openlaw")!;
+const tafep = TOOL_CATALOG.find((tool) => tool.id === "tafep")!;
 const litera = TOOL_CATALOG.find((tool) => tool.id === "litera-compare")!;
 const imanage = TOOL_CATALOG.find((tool) => tool.id === "imanage")!;
 
@@ -23,6 +24,7 @@ const recommendations = [
 
 const searchGuide = {
   id: "openlaw-search-field-guide",
+  screenshotAssetId: "openlaw-lawnet-openlaw-judgments-expanded-sidebar",
   toolId: "openlaw",
   toolName: "OpenLaw",
   title: "Locate the search field",
@@ -34,6 +36,16 @@ const searchGuide = {
   highlight: { x: 351, y: 214, width: 329, height: 60 },
   caption: "Start in the Search field on the left.",
   evidenceStatus: "reviewed-instruction",
+};
+
+const tafepGuide = {
+  ...searchGuide,
+  id: "tafep-homepage-guide",
+  screenshotAssetId: "tafep-tafep-homepage-workplace-fairness-act",
+  toolId: "tafep",
+  toolName: "TAFEP",
+  title: "Open Workplace Fairness",
+  screenshot: "/assets/screenshots/tafep/original/tafep-homepage-workplace-fairness-act.png",
 };
 
 const unavailableGuidance = {
@@ -58,6 +70,190 @@ afterEach(() => {
 });
 
 describe("Tutor shared Help Clip seam", () => {
+  it("ignores stale guidance when tool selection changes during generation", async () => {
+    let resolveFirst!: (response: Response) => void;
+    let resolveSecond!: (response: Response) => void;
+    const firstGuidance = new Promise<Response>((resolve) => {
+      resolveFirst = resolve;
+    });
+    const secondGuidance = new Promise<Response>((resolve) => {
+      resolveSecond = resolve;
+    });
+    let guidanceCalls = 0;
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url === "/api/recommend") {
+        return json({
+          source: "openrouter",
+          recommendations: [
+            { tool: tafep, reason: "Matches workplace guidance." },
+            { tool: openlaw, reason: "Matches judgment research." },
+          ],
+        });
+      }
+      if (url === "/api/guidance") {
+        guidanceCalls += 1;
+        return guidanceCalls === 1 ? firstGuidance : secondGuidance;
+      }
+      return json({ error: "Unexpected request" }, 500);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<Tutor />);
+
+    await user.click(screen.getByRole("button", { name: "Combined task" }));
+    const checkboxes = await screen.findAllByRole("checkbox", {
+      name: "Include in shared Help Clip",
+    });
+    await user.click(checkboxes[0]);
+    await user.click(checkboxes[1]);
+
+    await act(async () => {
+      resolveSecond(
+        json({
+          ...openLawGuidance,
+          teachingItems: [tafepGuide, searchGuide],
+          lessonPlanId: "contextual-current-selection",
+          supportTopicId: "screenshots:current-selection",
+          helpClipToken: "current-selection-token",
+        }),
+      );
+    });
+    expect(await screen.findByRole("tab", { name: "TAFEP (1)" })).toBeVisible();
+
+    await act(async () => {
+      resolveFirst(json(unavailableGuidance));
+    });
+    expect(screen.getByRole("tab", { name: "TAFEP (1)" })).toBeVisible();
+    expect(screen.getByRole("tab", { name: "OpenLaw (1)" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Generate shared Help Clip" })).toBeEnabled();
+  });
+
+  it("shows progress and withholds screenshot and video results until each request finishes", async () => {
+    let resolveGuidance!: (response: Response) => void;
+    let resolveClip!: (response: Response) => void;
+    const guidancePromise = new Promise<Response>((resolve) => {
+      resolveGuidance = resolve;
+    });
+    const clipPromise = new Promise<Response>((resolve) => {
+      resolveClip = resolve;
+    });
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url === "/api/recommend") {
+        return json({
+          source: "openrouter",
+          recommendations: [{ tool: openlaw, reason: "Matches." }],
+        });
+      }
+      if (url === "/api/guidance") {
+        return guidancePromise;
+      }
+      if (url === "/api/help-clip") {
+        return clipPromise;
+      }
+      return json({ error: "Unexpected request" }, 500);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<Tutor />);
+
+    await user.click(screen.getByRole("button", { name: "Find a judgment" }));
+    await user.click(
+      await screen.findByRole("checkbox", { name: "Include in shared Help Clip" }),
+    );
+
+    expect(
+      await screen.findByRole("progressbar", { name: "Generating screenshot guides" }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole("img", { name: "OpenLaw: Locate the search field" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Generate shared Help Clip" }),
+    ).not.toBeInTheDocument();
+
+    await act(async () => {
+      resolveGuidance(json(openLawGuidance));
+    });
+    const generateButton = await screen.findByRole("button", {
+      name: "Generate shared Help Clip",
+    });
+    expect(
+      screen.getByRole("img", { name: "OpenLaw: Locate the search field" }),
+    ).toBeVisible();
+
+    await user.click(generateButton);
+    expect(
+      await screen.findByRole("progressbar", { name: "Generating shared Help Clip" }),
+    ).toBeVisible();
+    expect(screen.queryByLabelText("Generated shared Help Clip")).not.toBeInTheDocument();
+
+    await act(async () => {
+      resolveClip(
+        json({
+          videoUrl: "/generated/test.mp4",
+          narration: "Reviewed narration.",
+          label: "Training demonstration",
+        }),
+      );
+    });
+    expect(await screen.findByLabelText("Generated shared Help Clip")).toBeVisible();
+    expect(
+      screen.queryByRole("progressbar", { name: "Generating shared Help Clip" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows separate screenshot tabs per tool while keeping one combined video action", async () => {
+    const multiToolGuidance = {
+      ...openLawGuidance,
+      teachingItems: [tafepGuide, searchGuide],
+      lessonPlanId: "contextual-multi-tool",
+      supportTopicId: "screenshots:multi-tool",
+    };
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url === "/api/recommend") {
+        return json({
+          source: "openrouter",
+          recommendations: [
+            { tool: tafep, reason: "Matches workplace guidance." },
+            { tool: openlaw, reason: "Matches judgment research." },
+          ],
+        });
+      }
+      if (url === "/api/guidance") {
+        return json(multiToolGuidance);
+      }
+      if (url === "/api/help-clip") {
+        return json({
+          videoUrl: "/generated/multi-tool.mp4",
+          narration: "Combined narration.",
+          label: "Training demonstration",
+        });
+      }
+      return json({ error: "Unexpected request" }, 500);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<Tutor />);
+
+    await user.click(screen.getByRole("button", { name: "Combined task" }));
+    const checkboxes = await screen.findAllByRole("checkbox", {
+      name: "Include in shared Help Clip",
+    });
+    await user.click(checkboxes[0]);
+    await user.click(checkboxes[1]);
+
+    const tafepTab = await screen.findByRole("tab", { name: "TAFEP (1)" });
+    const openLawTab = screen.getByRole("tab", { name: "OpenLaw (1)" });
+    expect(tafepTab).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("img", { name: "TAFEP: Open Workplace Fairness" })).toBeVisible();
+    expect(screen.queryByRole("img", { name: "OpenLaw: Locate the search field" })).not.toBeInTheDocument();
+
+    await user.click(openLawTab);
+    expect(openLawTab).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("img", { name: "OpenLaw: Locate the search field" })).toBeVisible();
+    expect(screen.getAllByRole("button", { name: "Generate shared Help Clip" })).toHaveLength(1);
+  });
+
   it("renders recommendation checkboxes, preserves their order, and removes Explore buttons", async () => {
     const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
       if (url === "/api/recommend") {
@@ -324,6 +520,8 @@ describe("Tutor shared Help Clip seam", () => {
     await user.click(screen.getByRole("button", { name: "Ask" }));
 
     expect(await screen.findByText(/Set the lower year to 2000/)).toBeVisible();
+    expect(screen.getAllByText("Expected result:").length).toBeGreaterThan(0);
+    expect(screen.queryByText("What this screenshot shows:")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Generate Help Clip for this answer" })).toBeEnabled();
 
     await user.type(input, "Where is the search field?");
@@ -345,6 +543,9 @@ describe("Tutor shared Help Clip seam", () => {
         role: "assistant",
         content: "The Decision Date range is in the left panel. Set the lower year to 2000.",
       },
+    ]);
+    expect(secondRequest.priorScreenshotIds).toEqual([
+      "openlaw-lawnet-openlaw-judgments-expanded-sidebar",
     ]);
 
     for (const laterQuestion of ["Third question", "Fourth question"]) {

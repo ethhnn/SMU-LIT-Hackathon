@@ -27,7 +27,7 @@ export const getOpenRouterClient = (): OpenAI | null => {
 };
 
 export const getRecommendationModel = (): string =>
-  process.env.OPENROUTER_MODEL?.trim() || "openai/gpt-4o-mini";
+  process.env.OPENROUTER_MODEL?.trim() || "openai/gpt-5.5";
 
 export const getTtsModel = (): string =>
   process.env.OPENROUTER_TTS_MODEL?.trim() ||

@@ -494,6 +494,101 @@
     "height": 1560
   },
   {
+    "id": "tafep-tafep-being-fair-fair-employment-practices-01",
+    "toolId": "tafep",
+    "filename": "tafep-being-fair-fair-employment-practices-01.png",
+    "label": "tafep being fair fair employment practices 01",
+    "keywords": [
+      "tafep",
+      "being",
+      "fair",
+      "employment",
+      "practices",
+      "01"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-being-fair-fair-employment-practices-01.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-being-fair-fair-employment-practices-01.jpg",
+    "width": 2529,
+    "height": 1381
+  },
+  {
+    "id": "tafep-tafep-being-fair-fair-employment-practices-02",
+    "toolId": "tafep",
+    "filename": "tafep-being-fair-fair-employment-practices-02.png",
+    "label": "tafep being fair fair employment practices 02",
+    "keywords": [
+      "tafep",
+      "being",
+      "fair",
+      "employment",
+      "practices",
+      "02"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-being-fair-fair-employment-practices-02.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-being-fair-fair-employment-practices-02.jpg",
+    "width": 2532,
+    "height": 1389
+  },
+  {
+    "id": "tafep-tafep-contact-us-employer-programmes-and-events-expanded",
+    "toolId": "tafep",
+    "filename": "tafep-contact-us-employer-programmes-and-events-expanded.png",
+    "label": "tafep contact us employer programmes and events expanded",
+    "keywords": [
+      "tafep",
+      "contact",
+      "us",
+      "employer",
+      "programmes",
+      "and",
+      "events",
+      "expanded"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-contact-us-employer-programmes-and-events-expanded.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-contact-us-employer-programmes-and-events-expanded.jpg",
+    "width": 2536,
+    "height": 1392
+  },
+  {
+    "id": "tafep-tafep-contact-us-feedback-expanded-service-commitment-and-location",
+    "toolId": "tafep",
+    "filename": "tafep-contact-us-feedback-expanded-service-commitment-and-location.png",
+    "label": "tafep contact us feedback expanded service commitment and location",
+    "keywords": [
+      "tafep",
+      "contact",
+      "us",
+      "feedback",
+      "expanded",
+      "service",
+      "commitment",
+      "and",
+      "location"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-contact-us-feedback-expanded-service-commitment-and-location.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-contact-us-feedback-expanded-service-commitment-and-location.jpg",
+    "width": 2530,
+    "height": 1383
+  },
+  {
+    "id": "tafep-tafep-contact-us-workplace-assistance-expanded",
+    "toolId": "tafep",
+    "filename": "tafep-contact-us-workplace-assistance-expanded.png",
+    "label": "tafep contact us workplace assistance expanded",
+    "keywords": [
+      "tafep",
+      "contact",
+      "us",
+      "workplace",
+      "assistance",
+      "expanded"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-contact-us-workplace-assistance-expanded.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-contact-us-workplace-assistance-expanded.jpg",
+    "width": 2533,
+    "height": 1387
+  },
+  {
     "id": "tafep-tafep-contact-us",
     "toolId": "tafep",
     "filename": "tafep-contact-us.png",
@@ -507,6 +602,25 @@
     "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-contact-us.jpg",
     "width": 2532,
     "height": 1392
+  },
+  {
+    "id": "tafep-tafep-employment-practices-links-and-latest-resources",
+    "toolId": "tafep",
+    "filename": "tafep-employment-practices-links-and-latest-resources.png",
+    "label": "tafep employment practices links and latest resources",
+    "keywords": [
+      "tafep",
+      "employment",
+      "practices",
+      "links",
+      "and",
+      "latest",
+      "resources"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-employment-practices-links-and-latest-resources.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-employment-practices-links-and-latest-resources.jpg",
+    "width": 2535,
+    "height": 1390
   },
   {
     "id": "tafep-tafep-employment-practices",
@@ -542,6 +656,44 @@
     "height": 1392
   },
   {
+    "id": "tafep-tafep-events-and-workshops-date-filters-and-footer",
+    "toolId": "tafep",
+    "filename": "tafep-events-and-workshops-date-filters-and-footer.png",
+    "label": "tafep events and workshops date filters and footer",
+    "keywords": [
+      "tafep",
+      "events",
+      "and",
+      "workshops",
+      "date",
+      "filters",
+      "footer"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-events-and-workshops-date-filters-and-footer.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-events-and-workshops-date-filters-and-footer.jpg",
+    "width": 2535,
+    "height": 1396
+  },
+  {
+    "id": "tafep-tafep-events-and-workshops-filters-and-load-more",
+    "toolId": "tafep",
+    "filename": "tafep-events-and-workshops-filters-and-load-more.png",
+    "label": "tafep events and workshops filters and load more",
+    "keywords": [
+      "tafep",
+      "events",
+      "and",
+      "workshops",
+      "filters",
+      "load",
+      "more"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-events-and-workshops-filters-and-load-more.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-events-and-workshops-filters-and-load-more.jpg",
+    "width": 2529,
+    "height": 1387
+  },
+  {
     "id": "tafep-tafep-events-and-workshops",
     "toolId": "tafep",
     "filename": "tafep-events-and-workshops.png",
@@ -556,6 +708,25 @@
     "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-events-and-workshops.jpg",
     "width": 2536,
     "height": 1393
+  },
+  {
+    "id": "tafep-tafep-flexible-work-arrangement-requests-guidelines-overview",
+    "toolId": "tafep",
+    "filename": "tafep-flexible-work-arrangement-requests-guidelines-overview.png",
+    "label": "tafep flexible work arrangement requests guidelines overview",
+    "keywords": [
+      "tafep",
+      "flexible",
+      "work",
+      "arrangement",
+      "requests",
+      "guidelines",
+      "overview"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-flexible-work-arrangement-requests-guidelines-overview.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-flexible-work-arrangement-requests-guidelines-overview.jpg",
+    "width": 2532,
+    "height": 1392
   },
   {
     "id": "tafep-tafep-homepage-workplace-fairness-act",
@@ -591,6 +762,42 @@
     "height": 1392
   },
   {
+    "id": "tafep-tafep-media-speeches-and-fact-checks",
+    "toolId": "tafep",
+    "filename": "tafep-media-speeches-and-fact-checks.png",
+    "label": "tafep media speeches and fact checks",
+    "keywords": [
+      "tafep",
+      "media",
+      "speeches",
+      "and",
+      "fact",
+      "checks"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-media-speeches-and-fact-checks.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-media-speeches-and-fact-checks.jpg",
+    "width": 2538,
+    "height": 1389
+  },
+  {
+    "id": "tafep-tafep-recruitment-and-grievance-handling-standards",
+    "toolId": "tafep",
+    "filename": "tafep-recruitment-and-grievance-handling-standards.png",
+    "label": "tafep recruitment and grievance handling standards",
+    "keywords": [
+      "tafep",
+      "recruitment",
+      "and",
+      "grievance",
+      "handling",
+      "standards"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-recruitment-and-grievance-handling-standards.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-recruitment-and-grievance-handling-standards.jpg",
+    "width": 2523,
+    "height": 1384
+  },
+  {
     "id": "tafep-tafep-resources-search-and-filters",
     "toolId": "tafep",
     "filename": "tafep-resources-search-and-filters.png",
@@ -621,6 +828,25 @@
     "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-tripartite-guidelines.jpg",
     "width": 2536,
     "height": 1390
+  },
+  {
+    "id": "tafep-tafep-workplace-fairness-guides-and-reference-links",
+    "toolId": "tafep",
+    "filename": "tafep-workplace-fairness-guides-and-reference-links.png",
+    "label": "tafep workplace fairness guides and reference links",
+    "keywords": [
+      "tafep",
+      "workplace",
+      "fairness",
+      "guides",
+      "and",
+      "reference",
+      "links"
+    ],
+    "originalUrl": "/assets/screenshots/tafep/original/tafep-workplace-fairness-guides-and-reference-links.png",
+    "thumbnailUrl": "/assets/screenshots/tafep/thumbnail/tafep-workplace-fairness-guides-and-reference-links.jpg",
+    "width": 2538,
+    "height": 1384
   },
   {
     "id": "tafep-tafep-workplace-fairness-overview",

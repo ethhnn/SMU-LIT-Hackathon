@@ -359,6 +359,76 @@
     ]
   },
   {
+    "id": "tafep-tafep-being-fair-fair-employment-practices-01",
+    "toolId": "tafep",
+    "filename": "tafep-being-fair-fair-employment-practices-01.png",
+    "keywords": [
+      "tafep",
+      "being",
+      "fair",
+      "employment",
+      "practices",
+      "01"
+    ]
+  },
+  {
+    "id": "tafep-tafep-being-fair-fair-employment-practices-02",
+    "toolId": "tafep",
+    "filename": "tafep-being-fair-fair-employment-practices-02.png",
+    "keywords": [
+      "tafep",
+      "being",
+      "fair",
+      "employment",
+      "practices",
+      "02"
+    ]
+  },
+  {
+    "id": "tafep-tafep-contact-us-employer-programmes-and-events-expanded",
+    "toolId": "tafep",
+    "filename": "tafep-contact-us-employer-programmes-and-events-expanded.png",
+    "keywords": [
+      "tafep",
+      "contact",
+      "us",
+      "employer",
+      "programmes",
+      "and",
+      "events",
+      "expanded"
+    ]
+  },
+  {
+    "id": "tafep-tafep-contact-us-feedback-expanded-service-commitment-and-location",
+    "toolId": "tafep",
+    "filename": "tafep-contact-us-feedback-expanded-service-commitment-and-location.png",
+    "keywords": [
+      "tafep",
+      "contact",
+      "us",
+      "feedback",
+      "expanded",
+      "service",
+      "commitment",
+      "and",
+      "location"
+    ]
+  },
+  {
+    "id": "tafep-tafep-contact-us-workplace-assistance-expanded",
+    "toolId": "tafep",
+    "filename": "tafep-contact-us-workplace-assistance-expanded.png",
+    "keywords": [
+      "tafep",
+      "contact",
+      "us",
+      "workplace",
+      "assistance",
+      "expanded"
+    ]
+  },
+  {
     "id": "tafep-tafep-contact-us",
     "toolId": "tafep",
     "filename": "tafep-contact-us.png",
@@ -366,6 +436,20 @@
       "tafep",
       "contact",
       "us"
+    ]
+  },
+  {
+    "id": "tafep-tafep-employment-practices-links-and-latest-resources",
+    "toolId": "tafep",
+    "filename": "tafep-employment-practices-links-and-latest-resources.png",
+    "keywords": [
+      "tafep",
+      "employment",
+      "practices",
+      "links",
+      "and",
+      "latest",
+      "resources"
     ]
   },
   {
@@ -392,6 +476,34 @@
     ]
   },
   {
+    "id": "tafep-tafep-events-and-workshops-date-filters-and-footer",
+    "toolId": "tafep",
+    "filename": "tafep-events-and-workshops-date-filters-and-footer.png",
+    "keywords": [
+      "tafep",
+      "events",
+      "and",
+      "workshops",
+      "date",
+      "filters",
+      "footer"
+    ]
+  },
+  {
+    "id": "tafep-tafep-events-and-workshops-filters-and-load-more",
+    "toolId": "tafep",
+    "filename": "tafep-events-and-workshops-filters-and-load-more.png",
+    "keywords": [
+      "tafep",
+      "events",
+      "and",
+      "workshops",
+      "filters",
+      "load",
+      "more"
+    ]
+  },
+  {
     "id": "tafep-tafep-events-and-workshops",
     "toolId": "tafep",
     "filename": "tafep-events-and-workshops.png",
@@ -400,6 +512,20 @@
       "events",
       "and",
       "workshops"
+    ]
+  },
+  {
+    "id": "tafep-tafep-flexible-work-arrangement-requests-guidelines-overview",
+    "toolId": "tafep",
+    "filename": "tafep-flexible-work-arrangement-requests-guidelines-overview.png",
+    "keywords": [
+      "tafep",
+      "flexible",
+      "work",
+      "arrangement",
+      "requests",
+      "guidelines",
+      "overview"
     ]
   },
   {
@@ -426,6 +552,32 @@
     ]
   },
   {
+    "id": "tafep-tafep-media-speeches-and-fact-checks",
+    "toolId": "tafep",
+    "filename": "tafep-media-speeches-and-fact-checks.png",
+    "keywords": [
+      "tafep",
+      "media",
+      "speeches",
+      "and",
+      "fact",
+      "checks"
+    ]
+  },
+  {
+    "id": "tafep-tafep-recruitment-and-grievance-handling-standards",
+    "toolId": "tafep",
+    "filename": "tafep-recruitment-and-grievance-handling-standards.png",
+    "keywords": [
+      "tafep",
+      "recruitment",
+      "and",
+      "grievance",
+      "handling",
+      "standards"
+    ]
+  },
+  {
     "id": "tafep-tafep-resources-search-and-filters",
     "toolId": "tafep",
     "filename": "tafep-resources-search-and-filters.png",
@@ -445,6 +597,20 @@
       "tafep",
       "tripartite",
       "guidelines"
+    ]
+  },
+  {
+    "id": "tafep-tafep-workplace-fairness-guides-and-reference-links",
+    "toolId": "tafep",
+    "filename": "tafep-workplace-fairness-guides-and-reference-links.png",
+    "keywords": [
+      "tafep",
+      "workplace",
+      "fairness",
+      "guides",
+      "and",
+      "reference",
+      "links"
     ]
   },
   {

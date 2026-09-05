@@ -10,7 +10,7 @@ describe("generated screenshot index", () => {
     const library = getScreenshotLibrary();
     const sourceSets = [
       { directory: "LawNetScreenshots", toolId: "openlaw" },
-      { directory: "TAFEP", toolId: "tafep" },
+      { directory: "TAFEPScreenshots", toolId: "tafep" },
     ];
     const sourceCount = sourceSets.reduce(
       (total, source) =>

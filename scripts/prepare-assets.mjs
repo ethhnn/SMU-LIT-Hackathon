@@ -21,7 +21,7 @@ const sources = [
     toolId: "openlaw",
   },
   {
-    directory: resolve(projectRoot, "Screenshots", "TAFEP"),
+    directory: resolve(projectRoot, "Screenshots", "TAFEPScreenshots"),
     toolId: "tafep",
   },
 ];

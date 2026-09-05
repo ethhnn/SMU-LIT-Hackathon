@@ -115,7 +115,9 @@ const shortlistScreenshots = async (
           role: "system",
           content:
             "Select up to six screenshot IDs that are most likely to help answer the current software-training question. " +
-            "Use the complete keyword index, scenario, and recent conversation. Follow-up questions may refer to the first or latest earlier answer. " +
+            "Use the human-reviewed website and reference description in the complete screenshot index, plus the scenario and recent conversation. " +
+            "Treat the reference description as authoritative for page identity, visible controls, filters, and captured state. " +
+            "Follow-up questions may refer to the first or latest earlier answer. " +
             "Return only JSON with screenshotIds. Do not answer the question and do not invent IDs.",
         },
         {
@@ -170,12 +172,14 @@ const refineHighlight = async ({
   question,
   title,
   instruction,
+  referenceDescription,
   fallback,
 }: {
   asset: ScreenshotAsset;
   question: string;
   title: string;
   instruction: string;
+  referenceDescription: string;
   fallback: z.infer<typeof normalizedHighlightSchema>;
 }): Promise<z.infer<typeof normalizedHighlightSchema>> => {
   const client = getOpenRouterClient();
@@ -202,7 +206,7 @@ const refineHighlight = async ({
           content: [
             {
               type: "text",
-              text: `Current question: ${question}\nScreenshot title: ${title}\nInstruction: ${instruction}\nScreenshot ID: ${asset.id}`,
+              text: `Current question: ${question}\nScreenshot title: ${title}\nInstruction: ${instruction}\nHuman-reviewed reference: ${referenceDescription}\nScreenshot ID: ${asset.id}`,
             },
             {
               type: "image_url",
@@ -269,7 +273,12 @@ export const answerWithScreenshotLibrary = async (
   for (const asset of candidates) {
     content.push({
       type: "text",
-      text: `Screenshot ID: ${asset.id}\nKeywords: ${asset.keywords.join(", ")}`,
+      text:
+        `Screenshot ID: ${asset.id}\n` +
+        `Website/product: ${asset.website}\n` +
+        `Human-reviewed screenshot reference: ${asset.referenceDescription}\n` +
+        `Shared controls for this website family: ${asset.sharedControls}\n` +
+        `Search keywords: ${asset.keywords.join(", ")}`,
     });
     content.push({
       type: "image_url",
@@ -289,9 +298,10 @@ export const answerWithScreenshotLibrary = async (
           content:
             "You are a software-training tutor with vision. Return only JSON with answer, imageCanAnswer, screenshotId, title, instruction, expectedResult, caption, and highlight. " +
             "Answer the current question directly. Use recent conversation to resolve pronouns and references, but do not repeat an earlier answer when the current question changed. " +
+            "Each candidate has human-reviewed reference metadata. Treat that metadata as authoritative for website identity, visible control names, filters, options, and expanded or selected state; use the image to confirm position and visual context. " +
             "Inspect every candidate image. If exactly one supplied image materially helps, set imageCanAnswer true, use its exact ID, and provide a tight 0-to-1000 highlight rectangle around only the relevant visible control or content. " +
             "Write a concrete instruction naming the exact visible control and action; avoid generic wording such as explore, visit the website, or use the search. Write expectedResult and caption only from what is actually visible. If no image helps, set imageCanAnswer false and all image fields to null. " +
-            "Never invent an interface, unseen click result, legal conclusion, or cross-tool handoff. State when guidance is based only on a supplied screenshot.",
+            "Never invent a control missing from the reference and image, an unseen click result, legal conclusion, or cross-tool handoff. State when guidance is based only on a supplied screenshot.",
         },
         { role: "user", content },
       ],
@@ -334,6 +344,7 @@ export const answerWithScreenshotLibrary = async (
       question: input.question,
       title: decision.title,
       instruction: decision.instruction,
+      referenceDescription: asset.referenceDescription,
       fallback: decision.highlight,
     });
     const highlight = toHighlight(asset, normalizedHighlight);

@@ -1,6 +1,7 @@
 export const TOOL_IDS = [
   "openlaw",
   "tafep",
+  "judiciary",
   "litera-compare",
   "imanage",
 ] as const;
@@ -59,6 +60,29 @@ export const TOOL_CATALOG: readonly CatalogTool[] = [
     ],
     tutorialCoverage: "partial",
     coverageLabel: "Help Clip available: locate the search field",
+  },
+  {
+    id: "judiciary",
+    name: "Judiciary.gov.sg / SG Courts",
+    intendedUse:
+      "Find Singapore court information, hearing listings, judgments, self-help guides, and court services.",
+    capabilities: [
+      "hearing search",
+      "court judgments",
+      "court services",
+      "self-help court guides",
+      "Sheriff's sales",
+    ],
+    pros: [
+      "Official directory for Singapore court information and services",
+      "Supplied screenshots cover hearing filters, judgments, services, and court guides",
+    ],
+    cons: [
+      "The prototype uses supplied screenshots and does not inspect the live site",
+      "Screenshot observations do not verify that a court transaction was completed",
+    ],
+    tutorialCoverage: "partial",
+    coverageLabel: "Screenshot-guided Help Clips available",
   },
   {
     id: "litera-compare",

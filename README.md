@@ -4,9 +4,9 @@ This hackathon MVP helps a lawyer learn how to operate a relevant technology for
 
 The learner writes a free-text objective or selects a sample. An OpenRouter-routed model recommends relevant technologies from a curated catalog, with intended uses, pros, limits, and tutorial coverage. The learner checks one or more recommended tools for a shared Help Clip and can continue with contextual teaching questions about that selected set.
 
-The active asset library contains 27 LawNet screenshots and 21 TAFEP screenshots. OpenRouter searches their generated keyword index and visually checks candidate images for each objective or question. These images support labelled screenshot-observation clips; the separately reviewed OpenLaw workflow coverage remains limited to locating the Search field. Litera Compare and iManage receive high-level text only until screenshots are supplied.
+The active asset library contains 27 LawNet screenshots, 21 TAFEP screenshots, and 38 Judiciary.gov.sg screenshots. Asset preparation validates these images against the human-reviewed files in [`docs/references/`](docs/references/), then generates searchable metadata containing the correct website/product identity, visible controls, filters, and captured state. OpenRouter uses that metadata both to shortlist images and to interpret the selected screenshot. These images support labelled screenshot-observation clips; the separately reviewed OpenLaw workflow coverage remains limited to locating the Search field. Litera Compare and iManage receive high-level text only until screenshots are supplied.
 
-The incoming project direction targets LawNet/OpenLaw, TAFEP, and Judiciary.gov.sg (SG Courts). The 38 Judiciary screenshots are now included in the repository, but Judiciary catalog integration and tutorials are pending. The running catalog still includes OpenLaw, TAFEP, Litera Compare, and iManage. Collecting screenshots does not establish reviewed tutorial coverage.
+The running catalogue includes OpenLaw, TAFEP, Judiciary.gov.sg / SG Courts, Litera Compare, and iManage. Judiciary has screenshot-observation coverage but no manually rehearsed workflow. Collecting and describing screenshots does not by itself establish reviewed tutorial coverage.
 
 The supplied R&T challenge focuses on technology adoption and short educational audio-video demonstrations grounded in practical use cases. See the [challenge brief](docs/challenge-brief.md). The prototype does not establish sustained adoption or make legal judgments for the learner.
 
@@ -15,7 +15,7 @@ Free-text training objective
   → OpenRouter scenario interpretation
   → Curated tool recommendations
   → Checkbox selection for a shared Help Clip
-  → Complete tool-specific image keyword index
+  → Validated human-reviewed screenshot reference index
   → OpenRouter shortlist + visual screenshot selection
   → Shared contextual guidance and Help Focus
   → Explicit Generate shared Help Clip request for a grounded scene
@@ -70,9 +70,9 @@ The repository contains 86 source screenshots named by page, section, or interfa
 | --- | --- | --- | --- |
 | LawNet/OpenLaw | [LawNetScreenshots](Screenshots/LawNetScreenshots/) | 27 | Indexed for screenshot selection |
 | TAFEP | [TAFEPScreenshots](Screenshots/TAFEPScreenshots/) | 21 | Indexed for screenshot selection |
-| Judiciary.gov.sg (SG Courts) | [JudiciaryGovScreenshots](Screenshots/JudiciaryGovScreenshots/) | 38 | Collected; catalog integration and tutorial coverage pending |
+| Judiciary.gov.sg (SG Courts) | [JudiciaryGovScreenshots](Screenshots/JudiciaryGovScreenshots/) | 38 | Indexed for screenshot selection |
 
-Judiciary captures include homepage menus, hearing-search filters, judgments, court services, e-platforms, Sheriff's sales and admiralty services, contact information, and court information pages. Asset preparation indexes the 48 images belonging to the currently supported screenshot collections. Highlights must match each exact captured layout; signed-in pages and public OpenLaw pages are distinct interface states.
+Judiciary captures include homepage menus, hearing-search filters, judgments, court services, e-platforms, Sheriff's sales and admiralty services, contact information, and court information pages. Asset preparation indexes all 86 images and fails if a source screenshot and its Markdown reference do not match. Highlights must match each exact captured layout; signed-in pages and public OpenLaw pages are distinct interface states.
 
 ## Known issues and handover
 

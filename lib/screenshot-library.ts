@@ -8,9 +8,12 @@ import { isToolId, type ToolId } from "@/lib/catalog";
 const screenshotAssetSchema = z.object({
   id: z.string().min(1),
   toolId: z.string().refine(isToolId),
+  website: z.string().min(1),
   filename: z.string().min(1),
   label: z.string().min(1),
   keywords: z.array(z.string().min(1)),
+  referenceDescription: z.string().min(1),
+  sharedControls: z.string(),
   originalUrl: z.string().startsWith("/assets/screenshots/"),
   thumbnailUrl: z.string().startsWith("/assets/screenshots/"),
   width: z.number().int().positive(),
@@ -67,6 +70,7 @@ export const getScreenshotKeywordIndex = (
   assets
     .map(
       (asset) =>
-        `- ${asset.id} | tool=${asset.toolId} | keywords=${asset.keywords.join(", ")}`,
+        `- ${asset.id} | tool=${asset.toolId} | website=${asset.website} | ` +
+        `reference=${asset.referenceDescription} | keywords=${asset.keywords.join(", ")}`,
     )
     .join("\n");

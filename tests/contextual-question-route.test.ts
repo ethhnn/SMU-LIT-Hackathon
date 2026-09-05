@@ -93,8 +93,17 @@ describe("contextual question route", () => {
     expect(keywordPrompt).toContain("Complete screenshot keyword index");
     expect(keywordPrompt).toContain("openlaw-lawnet-openlaw-legal-resources-menu");
     expect(keywordPrompt).toContain("openlaw-lawnet-research-ai-search");
+    expect(keywordPrompt).toContain("reference=");
+    expect(keywordPrompt).toContain("Legal Resources");
     const visionContent = createCompletion.mock.calls[1][0].messages[1].content;
     expect(visionContent.some((part: { type: string }) => part.type === "image_url")).toBe(true);
+    const referencePart = visionContent.find(
+      (part: { type: string; text?: string }) =>
+        part.type === "text" &&
+        part.text?.includes("Human-reviewed screenshot reference"),
+    );
+    expect(referencePart?.text).toContain("Website/product: OpenLaw");
+    expect(referencePart?.text).toContain("Legal Resources");
   });
 
   it("uses the latest three Q&A turns to resolve a follow-up question", async () => {

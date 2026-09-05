@@ -15,16 +15,94 @@ import ffmpegPath from "ffmpeg-static";
 const projectRoot = resolve(import.meta.dirname, "..");
 const publicRoot = resolve(projectRoot, "public", "assets", "screenshots");
 
+const referenceRoot = resolve(projectRoot, "docs", "references");
+
+const lawNetWebsite = (filename) => {
+  if (filename.startsWith("lawnet-academy-library")) return "LawNet Academy Library";
+  if (filename.startsWith("lawnet-account-hub")) return "SAL Account Hub";
+  if (filename.startsWith("lawnet-asian-insights")) return "LawNet Asian Insights";
+  if (filename === "lawnet-browse-legislation.png") return "LawNet Legislation";
+  if (filename.startsWith("lawnet-ethics")) return "SAL Ethics & Professional Standards Repository";
+  if (filename.startsWith("lawnet-intelligent-case")) return "SAL Intelligent Case Retrieval System";
+  if (filename.startsWith("lawnet-openlaw")) return "OpenLaw";
+  if (filename.startsWith("lawnet-precedents")) return "SAL Precedents";
+  if (filename.startsWith("lawnet-research")) return "LawNet Research";
+  if (filename.startsWith("lawnet-sentencing")) return "Sentencing Information & Research Repository";
+  if (filename.startsWith("lawnet-store")) return "LawNet Store";
+  if (filename.startsWith("lawnet-support")) return "SAL Support Hub";
+  if (filename.startsWith("sal-motor-accident")) return "SAL Motor Accident Claims Online";
+  if (filename.startsWith("scc-online")) return "SCC Online";
+  return "LawNet / SAL";
+};
+
 const sources = [
   {
     directory: resolve(projectRoot, "Screenshots", "LawNetScreenshots"),
     toolId: "openlaw",
+    reference: resolve(referenceRoot, "screenshot-reference-lawnet.md"),
+    websiteOf: lawNetWebsite,
   },
   {
     directory: resolve(projectRoot, "Screenshots", "TAFEPScreenshots"),
     toolId: "tafep",
+    reference: resolve(referenceRoot, "screenshot-reference-tafep.md"),
+    websiteOf: () => "TAFEP",
+  },
+  {
+    directory: resolve(projectRoot, "Screenshots", "JudiciaryGovScreenshots"),
+    toolId: "judiciary",
+    reference: resolve(referenceRoot, "screenshot-reference-judiciary.md"),
+    websiteOf: () => "Judiciary.gov.sg / SG Courts",
   },
 ];
+
+const normalizeReferenceText = (value) =>
+  value
+    .replace(/\*\*/g, "")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const readScreenshotReference = (referencePath) => {
+  if (!existsSync(referencePath)) {
+    throw new Error(`Screenshot reference is missing: ${referencePath}`);
+  }
+
+  const markdown = readFileSync(referencePath, "utf8");
+  const imagesHeading = markdown.indexOf("## Images and visible controls");
+  if (imagesHeading < 0) {
+    throw new Error(`Screenshot reference has no image table: ${referencePath}`);
+  }
+
+  const sharedStart = markdown.indexOf("## Shared controls");
+  const sharedControls = sharedStart >= 0
+    ? normalizeReferenceText(
+        markdown
+          .slice(sharedStart + "## Shared controls".length, imagesHeading)
+          .replace(/^## .+$/gm, " "),
+      )
+    : "";
+  const entries = new Map();
+  const tableRow = /^\|\s*`([^`]+\.png)`\s*\|\s*(.*?)\s*\|\s*$/gm;
+
+  for (const match of markdown.matchAll(tableRow)) {
+    const filename = match[1];
+    if (entries.has(filename)) {
+      throw new Error(`Duplicate screenshot reference for ${filename}`);
+    }
+    entries.set(filename, normalizeReferenceText(match[2]));
+  }
+  if (entries.size === 0) {
+    throw new Error(`Screenshot reference contains no image rows: ${referencePath}`);
+  }
+  return { entries, sharedControls };
+};
+
+const searchableWords = (value) =>
+  value
+    .toLowerCase()
+    .match(/[a-z0-9]+/g) || [];
 
 const dimensionsOfPng = (filePath) => {
   const bytes = readFileSync(filePath);
@@ -49,10 +127,30 @@ const refreshFile = (source, destination, create) => {
 };
 
 const manifest = [];
+const referenceMetadata = [];
 
 for (const source of sources) {
   if (!existsSync(source.directory)) {
-    continue;
+    throw new Error(`Screenshot source directory is missing: ${source.directory}`);
+  }
+
+  const reference = readScreenshotReference(source.reference);
+  const sourceFilenames = readdirSync(source.directory, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && extname(entry.name).toLowerCase() === ".png")
+    .map((entry) => entry.name);
+  const sourceFilenameSet = new Set(sourceFilenames);
+  const missingReferences = sourceFilenames.filter(
+    (filename) => !reference.entries.has(filename),
+  );
+  const unknownReferences = [...reference.entries.keys()].filter(
+    (filename) => !sourceFilenameSet.has(filename),
+  );
+  if (missingReferences.length > 0 || unknownReferences.length > 0) {
+    throw new Error(
+      `Screenshot reference mismatch for ${source.toolId}. ` +
+        `Missing: ${missingReferences.join(", ") || "none"}. ` +
+        `Unknown: ${unknownReferences.join(", ") || "none"}.`,
+    );
   }
 
   for (const entry of readdirSync(source.directory, { withFileTypes: true })) {
@@ -75,10 +173,20 @@ for (const source of sources) {
       thumbnailName,
     );
     const dimensions = dimensionsOfPng(sourcePath);
-    const keywords = [source.toolId, ...slug.split("-")].filter(
+    const website = source.websiteOf(entry.name);
+    const referenceDescription = reference.entries.get(entry.name);
+    if (!referenceDescription) {
+      throw new Error(`Screenshot description is missing for ${entry.name}`);
+    }
+    const keywords = [
+      source.toolId,
+      ...slug.split("-"),
+      ...searchableWords(website),
+      ...searchableWords(referenceDescription),
+    ].filter(
       (keyword, index, entries) =>
         keyword.length > 1 && entries.indexOf(keyword) === index,
-    );
+    ).slice(0, 80);
 
     refreshFile(sourcePath, originalPath, () => cpSync(sourcePath, originalPath));
     refreshFile(sourcePath, thumbnailPath, () => {
@@ -111,13 +219,24 @@ for (const source of sources) {
     manifest.push({
       id,
       toolId: source.toolId,
+      website,
       filename: entry.name,
       label: slug.replace(/-/g, " "),
       keywords,
+      referenceDescription,
+      sharedControls: reference.sharedControls,
       originalUrl: `/assets/screenshots/${source.toolId}/original/${entry.name}`,
       thumbnailUrl: `/assets/screenshots/${source.toolId}/thumbnail/${thumbnailName}`,
       width: dimensions.width,
       height: dimensions.height,
+    });
+    referenceMetadata.push({
+      id,
+      toolId: source.toolId,
+      website,
+      filename: entry.name,
+      referenceDescription,
+      sharedControls: reference.sharedControls,
     });
   }
 }
@@ -125,6 +244,7 @@ for (const source of sources) {
 manifest.sort((left, right) =>
   `${left.toolId}/${left.filename}`.localeCompare(`${right.toolId}/${right.filename}`),
 );
+referenceMetadata.sort((left, right) => left.id.localeCompare(right.id));
 mkdirSync(publicRoot, { recursive: true });
 writeFileSync(
   resolve(publicRoot, "manifest.json"),
@@ -133,15 +253,21 @@ writeFileSync(
 writeFileSync(
   resolve(publicRoot, "image-keywords.json"),
   `${JSON.stringify(
-    manifest.map(({ id, toolId, filename, keywords }) => ({
+    manifest.map(({ id, toolId, website, filename, keywords, referenceDescription }) => ({
       id,
       toolId,
+      website,
       filename,
       keywords,
+      referenceDescription,
     })),
     null,
     2,
   )}\n`,
+);
+writeFileSync(
+  resolve(publicRoot, "reference-metadata.json"),
+  `${JSON.stringify(referenceMetadata, null, 2)}\n`,
 );
 
 // Preserve the stable paths used by the reviewed OpenLaw starter lesson.

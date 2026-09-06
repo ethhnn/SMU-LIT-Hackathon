@@ -68,6 +68,8 @@ The model receives only these three catalog entries. Every returned tool ID is c
 
 It does not force an unrelated recommendation.
 
+Additional tools may be added in future versions. Each new tool must be deliberately added to the catalog and allowlist, with its intended purpose and training coverage defined before L.A.R.A can recommend it. Until then, recommendations remain restricted to the three tools above.
+
 ## How to use L.A.R.A
 
 ### Ask for recommendations

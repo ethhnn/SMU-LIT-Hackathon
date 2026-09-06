@@ -34,6 +34,13 @@ const SAMPLES = [
 
 type ApiError = { error?: string };
 
+type LocalVideo = {
+  name: string;
+  url: string;
+  sizeBytes: number;
+  updatedAt: string;
+};
+
 const postJson = async <T,>(url: string, payload: unknown): Promise<T> => {
   const response = await fetch(url, {
     method: "POST",
@@ -185,6 +192,7 @@ const ClipResult = ({ clip }: { clip: HelpClipResponse }) => (
 );
 
 export const Tutor = () => {
+  const [activeView, setActiveView] = useState<"chat" | "gallery">("chat");
   const [scenario, setScenario] = useState("");
   const [activeScenario, setActiveScenario] = useState("");
   const [recommendationResult, setRecommendationResult] =
@@ -201,6 +209,10 @@ export const Tutor = () => {
   const [isRecommending, setIsRecommending] = useState(false);
   const [isGuiding, setIsGuiding] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [galleryVideos, setGalleryVideos] = useState<LocalVideo[]>([]);
+  const [isLoadingGallery, setIsLoadingGallery] = useState(false);
+  const [galleryError, setGalleryError] = useState("");
+  const recommendationRequestId = useRef(0);
   const guidanceRequestId = useRef(0);
 
   const resetComposer = () => {
@@ -214,6 +226,40 @@ export const Tutor = () => {
     setQuestionError("");
     setClip(null);
     setIsGuiding(false);
+  };
+
+  const startNewChat = () => {
+    recommendationRequestId.current += 1;
+    resetComposer();
+    setActiveView("chat");
+    setScenario("");
+    setActiveScenario("");
+    setRecommendationResult(null);
+    setError("");
+    setIsRecommending(false);
+  };
+
+  const openGallery = async () => {
+    setActiveView("gallery");
+    setIsLoadingGallery(true);
+    setGalleryError("");
+
+    try {
+      const response = await fetch("/api/videos", { cache: "no-store" });
+      const data = (await response.json()) as { videos?: LocalVideo[]; error?: string };
+      if (!response.ok) {
+        throw new Error(data.error || "The local video gallery could not be loaded.");
+      }
+      setGalleryVideos(data.videos ?? []);
+    } catch (requestError) {
+      setGalleryError(
+        requestError instanceof Error
+          ? requestError.message
+          : "The local video gallery could not be loaded.",
+      );
+    } finally {
+      setIsLoadingGallery(false);
+    }
   };
 
   const requestGuidance = async (toolIds: ToolId[]) => {
@@ -257,6 +303,7 @@ export const Tutor = () => {
       return;
     }
 
+    const requestId = ++recommendationRequestId.current;
     setError("");
     setIsRecommending(true);
     resetComposer();
@@ -266,16 +313,22 @@ export const Tutor = () => {
       const result = await postJson<RecommendationResponse>("/api/recommend", {
         scenario: trimmed,
       });
-      setRecommendationResult(result);
+      if (requestId === recommendationRequestId.current) {
+        setRecommendationResult(result);
+      }
     } catch (requestError) {
-      setRecommendationResult(null);
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "Recommendations are unavailable right now.",
-      );
+      if (requestId === recommendationRequestId.current) {
+        setRecommendationResult(null);
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Recommendations are unavailable right now.",
+        );
+      }
     } finally {
-      setIsRecommending(false);
+      if (requestId === recommendationRequestId.current) {
+        setIsRecommending(false);
+      }
     }
   };
 
@@ -474,37 +527,63 @@ export const Tutor = () => {
     ) ?? [];
 
   return (
-    <main className="shell">
-      <section className="hero" aria-labelledby="page-title">
-        <div className="eyebrow">R&amp;T legal-tech hackathon MVP</div>
-        <h1 id="page-title">Learn the right workflow for your task</h1>
-        <p>
-          Describe a software-training objective. The tutor recommends catalog
-          tools, then creates Help Clips only from supplied screenshot scenes
-          with server-controlled highlights and instructions.
-        </p>
-        <p className="notice" role="note">
-          Training environment — do not enter confidential client or matter
-          information.
-        </p>
-      </section>
+    <div className="app-shell">
+      <aside className="sidebar" aria-label="L.A.R.A navigation">
+        <div className="sidebar-brand">
+          <img src="/lara-logo.png" alt="L.A.R.A" />
+        </div>
+        <button className="new-chat-button" type="button" onClick={startNewChat}>
+          <span aria-hidden="true">＋</span>
+          New chat
+        </button>
+        <button
+          className={`sidebar-button ${activeView === "gallery" ? "active" : ""}`}
+          type="button"
+          onClick={() => void openGallery()}
+        >
+          <span aria-hidden="true">▶</span>
+          Video gallery
+        </button>
+        <div className="sidebar-spacer" />
+        <p className="sidebar-caption">Legal Adoption &amp; Recommendation Assistant</p>
+      </aside>
+
+      <main className="shell">
+        <header className="topbar">
+          <strong>L.A.R.A</strong>
+          <span>{activeView === "gallery" ? "Video gallery" : "Legal technology guidance"}</span>
+        </header>
+
+        <div className="chat-content" hidden={activeView !== "chat"}>
+          {!recommendationResult ? (
+            <section className="hero" aria-labelledby="page-title">
+              <img
+                className="hero-logo"
+                src="/lara-logo.png"
+                alt="L.A.R.A — Legal Adoption & Recommendation Assistant"
+              />
+              <h1 id="page-title">How can I help with your legal workflow?</h1>
+              <p>
+                Describe what you need to do. L.A.R.A will recommend suitable tools
+                and guide you with grounded screenshots and Help Clips.
+              </p>
+            </section>
+          ) : null}
 
       <section className="panel scenario-panel" aria-labelledby="scenario-heading">
-        <div>
-          <div className="eyebrow">1. Scenario</div>
-          <h2 id="scenario-heading">What are you trying to do?</h2>
-        </div>
+        <h2 id="scenario-heading" className="sr-only">What are you trying to do?</h2>
         <form onSubmit={submitScenario} className="scenario-form">
-          <label htmlFor="scenario">Describe your generic training objective</label>
+          <label className="sr-only" htmlFor="scenario">Describe your generic training objective</label>
           <textarea
             id="scenario"
             value={scenario}
             onChange={(event) => setScenario(event.target.value)}
-            placeholder="For example: I need to compare two versions of a supplier agreement and then find related Singapore judgments."
-            rows={4}
+            placeholder="Message L.A.R.A"
+            rows={2}
           />
           <button type="submit" disabled={isRecommending}>
-            {isRecommending ? "Finding suitable tools…" : "Recommend tools"}
+            <span className="submit-label">{isRecommending ? "Finding suitable tools…" : "Recommend tools"}</span>
+            <span className="send-icon" aria-hidden="true">↑</span>
           </button>
         </form>
         <div className="sample-row" aria-label="Sample scenarios">
@@ -535,10 +614,17 @@ export const Tutor = () => {
       ) : null}
 
       {recommendationResult ? (
+        <div className="user-prompt" aria-label="Your training objective">
+          <span>You</span>
+          <p>{activeScenario}</p>
+        </div>
+      ) : null}
+
+      {recommendationResult ? (
         <section className="panel recommendations" aria-labelledby="recommendation-heading">
           <div className="section-heading">
             <div>
-              <div className="eyebrow">2. Recommendations</div>
+              <div className="eyebrow">L.A.R.A</div>
               <h2 id="recommendation-heading">Suitable technologies</h2>
             </div>
             <span className="source-note">
@@ -600,7 +686,7 @@ export const Tutor = () => {
         <section className="panel shared-composer" aria-labelledby="composer-heading">
           <div className="section-heading">
             <div>
-              <div className="eyebrow">3. Shared Help Clip</div>
+              <div className="eyebrow">L.A.R.A · Shared Help Clip</div>
               <h2 id="composer-heading">Create one tutorial clip</h2>
             </div>
             <span className="focus-chip">
@@ -678,7 +764,7 @@ export const Tutor = () => {
                     <p>{turn.question}</p>
                   </div>
                   <div className="chat-message tutor-message">
-                    <span>Tutor</span>
+                    <span>L.A.R.A</span>
                     <p>{turn.answer}</p>
                     <span className={`grounding-badge ${turn.groundingStatus}`}>
                       {turn.groundingStatus === "reviewed-instruction"
@@ -734,7 +820,7 @@ export const Tutor = () => {
                     <p>{pendingQuestion}</p>
                   </div>
                   <div className="chat-message tutor-message">
-                    <span>Tutor</span>
+                    <span>L.A.R.A</span>
                     <GenerationProgress
                       label="Generating screenshot guides"
                       detail="Preparing the answer and validating all relevant screenshots before display."
@@ -776,6 +862,67 @@ export const Tutor = () => {
             </form>
           </section>
       ) : null}
-    </main>
+        </div>
+        <div className="gallery-content" hidden={activeView !== "gallery"}>
+          <div className="gallery-heading">
+            <div>
+              <div className="eyebrow">Local library</div>
+              <h1>Video gallery</h1>
+              <p>Help Clips generated by L.A.R.A and stored on this computer.</p>
+            </div>
+            <button type="button" className="secondary-button" onClick={() => void openGallery()}>
+              Refresh
+            </button>
+          </div>
+
+          {isLoadingGallery ? (
+            <GenerationProgress
+              label="Loading video gallery"
+              detail="Checking locally generated clips."
+            />
+          ) : null}
+
+          {!isLoadingGallery && galleryError ? (
+            <div className="alert" role="alert">{galleryError}</div>
+          ) : null}
+
+          {!isLoadingGallery && !galleryError && galleryVideos.length === 0 ? (
+            <div className="empty-gallery">
+              <span aria-hidden="true">▶</span>
+              <h2>No generated videos yet</h2>
+              <p>Your locally generated Help Clips will appear here automatically.</p>
+              <button type="button" onClick={startNewChat}>Create a Help Clip</button>
+            </div>
+          ) : null}
+
+          {!isLoadingGallery && !galleryError && galleryVideos.length > 0 ? (
+            <div className="video-grid">
+              {galleryVideos.map((video) => (
+                <article className="video-card" key={video.name}>
+                  <video controls preload="metadata" aria-label={`Generated video: ${video.name}`}>
+                    <source src={video.url} type="video/mp4" />
+                    Your browser cannot play this video.
+                  </video>
+                  <div className="video-card-copy">
+                    <h2>{video.name.replace(/\.mp4$/i, "").replaceAll("-", " ")}</h2>
+                    <p>
+                      {new Intl.DateTimeFormat(undefined, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      }).format(new Date(video.updatedAt))}
+                      {" · "}
+                      {(video.sizeBytes / 1024 / 1024).toFixed(1)} MB
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : null}
+        </div>
+        <footer className="privacy-footer">
+          L.A.R.A can make mistakes. Do not enter confidential client or matter information.
+        </footer>
+      </main>
+    </div>
   );
 };

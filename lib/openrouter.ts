@@ -21,7 +21,7 @@ export const getOpenRouterClient = (): OpenAI | null => {
     baseURL: OPENROUTER_BASE_URL,
     defaultHeaders: {
       "HTTP-Referer": process.env.OPENROUTER_SITE_URL?.trim() || "http://localhost:3000",
-      "X-Title": "R&T Workflow Tutor",
+      "X-Title": "L.A.R.A",
     },
   });
 };

@@ -1,6 +1,6 @@
-# R&T Workflow Tutor
+# L.A.R.A
 
-This hackathon MVP helps a lawyer learn how to operate a relevant technology for a non-confidential training objective. It is a software-training tutor, not a legal-advice tool.
+L.A.R.A (Legal Adoption & Recommendation Assistant) helps a lawyer learn how to operate a relevant technology for a non-confidential training objective. It is a software-training tutor, not a legal-advice tool.
 
 The learner writes a free-text objective or selects a sample. An OpenRouter-routed model recommends relevant technologies from a curated catalog, with intended uses, pros, limits, and tutorial coverage. The learner checks one or more recommended tools for a shared Help Clip and can continue with contextual teaching questions about that selected set.
 

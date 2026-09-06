@@ -338,7 +338,7 @@ describe("Tutor shared Help Clip seam", () => {
     expect(request.toolIds).toEqual(["litera-compare", "imanage", "openlaw"]);
   });
 
-  it("clears the shared selection when a new scenario is submitted", async () => {
+  it("clears the shared selection before a new chat submits another scenario", async () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url === "/api/recommend") {
         return json({ source: "openrouter", recommendations: [{ tool: openlaw, reason: "Matches." }] });
@@ -354,7 +354,8 @@ describe("Tutor shared Help Clip seam", () => {
     await user.click(screen.getByRole("checkbox", { name: "Include in shared Help Clip" }));
     await screen.findByText("1 tool selected");
 
-    await user.clear(screen.getByLabelText("Describe your generic training objective"));
+    await user.click(screen.getByRole("button", { name: "New chat" }));
+    expect(screen.queryByText("1 tool selected")).not.toBeInTheDocument();
     await user.type(
       screen.getByLabelText("Describe your generic training objective"),
       "I need to compare document versions.",

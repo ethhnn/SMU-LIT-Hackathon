@@ -41,6 +41,40 @@ type LocalVideo = {
   updatedAt: string;
 };
 
+const OPENROUTER_CONNECTION_MESSAGE =
+  "I could not connect to OpenRouter, so screenshot interpretation and video generation are temporarily unavailable. Check network access and retry.";
+
+const displayGuidanceMessage = (message: string) =>
+  message.includes(OPENROUTER_CONNECTION_MESSAGE)
+    ? "L.A.R.A could not connect to OpenRouter. Screenshot guidance and video generation are temporarily unavailable; check the connection and retry."
+    : message;
+
+const consolidateCoverageMessages = (items: string[]) => {
+  const repeatedText =
+    "no complete screenshot route with validated highlights was confirmed for this objective. The combined video remains unavailable until every selected tool has at least one grounded scene.";
+  const matchingTools = items.flatMap((item) => {
+    const marker = `: ${repeatedText}`;
+    return item.endsWith(marker) ? [item.slice(0, -marker.length)] : [];
+  });
+  const otherItems = items.filter(
+    (item) => !item.endsWith(`: ${repeatedText}`),
+  );
+
+  if (matchingTools.length === 0) {
+    return items;
+  }
+
+  const toolList = new Intl.ListFormat("en", {
+    style: "long",
+    type: "conjunction",
+  }).format(matchingTools);
+
+  return [
+    `No complete screenshot route with validated highlights was confirmed for ${toolList}. The combined video remains unavailable until every selected tool has at least one grounded scene.`,
+    ...otherItems,
+  ];
+};
+
 const postJson = async <T,>(url: string, payload: unknown): Promise<T> => {
   const response = await fetch(url, {
     method: "POST",
@@ -308,6 +342,7 @@ export const Tutor = () => {
     setIsRecommending(true);
     resetComposer();
     setActiveScenario(trimmed);
+    setScenario("");
 
     try {
       const result = await postJson<RecommendationResponse>("/api/recommend", {
@@ -525,6 +560,12 @@ export const Tutor = () => {
     recommendationResult?.recommendations.filter((recommendation) =>
       selectedToolIds.includes(recommendation.tool.id),
     ) ?? [];
+  const guidanceConnectionFailed = Boolean(
+    guidance?.message.includes(OPENROUTER_CONNECTION_MESSAGE),
+  );
+  const guidanceCoverageMessages = consolidateCoverageMessages(
+    guidance?.missingCoverage ?? [],
+  );
 
   return (
     <div className="app-shell">
@@ -555,7 +596,7 @@ export const Tutor = () => {
         </header>
 
         <div className="chat-content" hidden={activeView !== "chat"}>
-          {!recommendationResult ? (
+          {!activeScenario ? (
             <section className="hero" aria-labelledby="page-title">
               <img
                 className="hero-logo"
@@ -570,38 +611,6 @@ export const Tutor = () => {
             </section>
           ) : null}
 
-      <section className="panel scenario-panel" aria-labelledby="scenario-heading">
-        <h2 id="scenario-heading" className="sr-only">What are you trying to do?</h2>
-        <form onSubmit={submitScenario} className="scenario-form">
-          <label className="sr-only" htmlFor="scenario">Describe your generic training objective</label>
-          <textarea
-            id="scenario"
-            value={scenario}
-            onChange={(event) => setScenario(event.target.value)}
-            placeholder="Message L.A.R.A"
-            rows={2}
-          />
-          <button type="submit" disabled={isRecommending}>
-            <span className="submit-label">{isRecommending ? "Finding suitable tools…" : "Recommend tools"}</span>
-            <span className="send-icon" aria-hidden="true">↑</span>
-          </button>
-        </form>
-        <div className="sample-row" aria-label="Sample scenarios">
-          <span>Try a sample:</span>
-          {SAMPLES.map((sample) => (
-            <button
-              key={sample.label}
-              type="button"
-              className="secondary-button"
-              onClick={() => selectSample(sample.scenario)}
-              disabled={isRecommending}
-            >
-              {sample.label}
-            </button>
-          ))}
-        </div>
-      </section>
-
       {error ? (
         <div className="alert" role="alert">
           {error}
@@ -613,10 +622,19 @@ export const Tutor = () => {
         </div>
       ) : null}
 
-      {recommendationResult ? (
+      {activeScenario ? (
         <div className="user-prompt" aria-label="Your training objective">
           <span>You</span>
           <p>{activeScenario}</p>
+        </div>
+      ) : null}
+
+      {isRecommending ? (
+        <div className="assistant-progress">
+          <GenerationProgress
+            label="Finding suitable tools"
+            detail="L.A.R.A is interpreting your objective."
+          />
         </div>
       ) : null}
 
@@ -707,10 +725,10 @@ export const Tutor = () => {
                 detail="Selecting, ordering, and validating every screenshot before display."
               />
             ) : null}
-            {!isGuiding && guidance ? <p>{guidance.message}</p> : null}
-            {!isGuiding && guidance?.missingCoverage.length ? (
+            {!isGuiding && guidance ? <p>{displayGuidanceMessage(guidance.message)}</p> : null}
+            {!isGuiding && !guidanceConnectionFailed && guidanceCoverageMessages.length ? (
               <ul className="coverage-limit">
-                {guidance.missingCoverage.map((item) => <li key={item}>{item}</li>)}
+                {guidanceCoverageMessages.map((item) => <li key={item}>{item}</li>)}
               </ul>
             ) : null}
           </div>
@@ -776,7 +794,9 @@ export const Tutor = () => {
                     <ScreenshotTeaching items={turn.teachingItems} />
                     {turn.missingCoverage.length ? (
                       <ul className="coverage-limit">
-                        {turn.missingCoverage.map((item) => <li key={item}>{item}</li>)}
+                        {consolidateCoverageMessages(turn.missingCoverage).map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
                       </ul>
                     ) : null}
                     <button
@@ -843,25 +863,69 @@ export const Tutor = () => {
               </div>
             ) : null}
 
-            <form className="follow-up" onSubmit={askQuestion}>
-              <label htmlFor="question">Ask your next question</label>
-              <div>
-                <input
-                  id="question"
-                  value={question}
-                  onChange={(event) => setQuestion(event.target.value)}
-                  placeholder="For example: How do I filter cases from 2000 onwards?"
-                />
-                <button
-                  type="submit"
-                  disabled={Boolean(pendingQuestion) || !question.trim() || !activeScenario}
-                >
-                  Ask
-                </button>
-              </div>
-            </form>
           </section>
       ) : null}
+
+      <section className="panel scenario-panel" aria-label="Message composer">
+        <form
+          onSubmit={recommendationResult ? askQuestion : submitScenario}
+          className="scenario-form"
+        >
+          <label className="sr-only" htmlFor={recommendationResult ? "question" : "scenario"}>
+            {recommendationResult
+              ? "Ask your next question"
+              : "Describe your generic training objective"}
+          </label>
+          <textarea
+            id={recommendationResult ? "question" : "scenario"}
+            value={recommendationResult ? question : scenario}
+            onChange={(event) =>
+              recommendationResult
+                ? setQuestion(event.target.value)
+                : setScenario(event.target.value)
+            }
+            placeholder={
+              recommendationResult
+                ? "Ask a follow-up about these tools"
+                : "Message L.A.R.A"
+            }
+            rows={2}
+          />
+          <button
+            type="submit"
+            disabled={
+              recommendationResult
+                ? Boolean(pendingQuestion) || !question.trim() || !activeScenario
+                : isRecommending
+            }
+          >
+            <span className="submit-label">
+              {recommendationResult
+                ? "Ask"
+                : isRecommending
+                  ? "Finding suitable tools…"
+                  : "Recommend tools"}
+            </span>
+            <span className="send-icon" aria-hidden="true">↑</span>
+          </button>
+        </form>
+        {!activeScenario ? (
+          <div className="sample-row" aria-label="Sample scenarios">
+            <span>Try a sample:</span>
+            {SAMPLES.map((sample) => (
+              <button
+                key={sample.label}
+                type="button"
+                className="secondary-button"
+                onClick={() => selectSample(sample.scenario)}
+                disabled={isRecommending}
+              >
+                {sample.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </section>
         </div>
         <div className="gallery-content" hidden={activeView !== "gallery"}>
           <div className="gallery-heading">

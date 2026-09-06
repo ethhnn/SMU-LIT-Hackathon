@@ -4,7 +4,6 @@ coverage/
 test-results/
 *.tsbuildinfo
 public/generated/*
-!public/generated/.gitkeep
 .env
 .env.local
 .env.*.local

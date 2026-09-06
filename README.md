@@ -8,7 +8,7 @@ The active asset library contains 27 LawNet screenshots, 21 TAFEP screenshots, a
 
 The running catalogue includes OpenLaw, TAFEP, Judiciary.gov.sg / SG Courts, Litera Compare, and iManage. Judiciary has screenshot-observation coverage but no manually rehearsed workflow. Collecting and describing screenshots does not by itself establish reviewed tutorial coverage.
 
-The supplied R&T challenge focuses on technology adoption and short educational audio-video demonstrations grounded in practical use cases. See the [challenge brief](docs/challenge-brief.md). The prototype does not establish sustained adoption or make legal judgments for the learner.
+The supplied R&T challenge focuses on technology adoption and short educational audio-video demonstrations grounded in practical use cases. The prototype does not establish sustained adoption or make legal judgments for the learner.
 
 ```text
 Free-text training objective
@@ -55,8 +55,6 @@ It writes a narrated MP4 to `public/generated/`. Inspect it for audible narratio
 
 ## Current OpenLaw asset boundary
 
-The selected public training target and exact asset status live in [docs/openlaw-training-assets.md](docs/openlaw-training-assets.md).
-
 - **Ready:** the starting OpenLaw judgments screen and the reviewed instruction to locate the Search field.
 - **Pending manual capture and rehearsal:** populated search, submitted results, and opened matching judgment.
 
@@ -74,16 +72,6 @@ The repository contains 86 source screenshots named by page, section, or interfa
 
 Judiciary captures include homepage menus, hearing-search filters, judgments, court services, e-platforms, Sheriff's sales and admiralty services, contact information, and court information pages. Asset preparation indexes all 86 images and fails if a source screenshot and its Markdown reference do not match. Highlights must match each exact captured layout; signed-in pages and public OpenLaw pages are distinct interface states.
 
-## Known issues and handover
+## Screenshot references
 
-The [screenshot-guidance handover](docs/handovers/2026-09-05-screenshot-guidance.md) records the original oversized highlights, wrong-page contextual answers, and single-screenshot limitation. Page-specific references, current-question retrieval priority, prior-image context, and ordered multi-screenshot explanations are now implemented. Highlight quality remains model-dependent and should still be inspected during the real-media check.
-
-## Project source of truth
-
-- [MVP specification](docs/spec.md)
-- [MVP plan](docs/mvp-plan.md)
-- [Domain vocabulary](CONTEXT.md)
-- [Architecture decisions](docs/ADRs)
-- [Local ticket tracker](docs/agents/issue-tracker.md)
-
-The local tickets preserve their dependency order: asset preparation and scenario guidance can proceed independently; the full Help Clip ticket remains blocked until the asset workflow is complete and the real rendered clip is inspected. The shared-composer ticket records the completed selection and coverage-gating work.
+The human-reviewed screenshot index is in [docs/references/](docs/references/). Keep those files aligned with the source images because asset preparation validates them before development and production builds.

@@ -21,14 +21,14 @@ const SAMPLES = [
       "A colleague has given me a public Singapore judgment name. I need to locate and open it for a training exercise.",
   },
   {
-    label: "Compare documents",
+    label: "Workplace guidance",
     scenario:
-      "I need to compare two versions of a supplier agreement and identify the changes.",
+      "I need guidance on fair workplace practices and employment fairness in Singapore.",
   },
   {
     label: "Combined task",
     scenario:
-      "For a training exercise, I need to compare two versions of a supplier agreement, organize the related case documents, and find public Singapore judgments relevant to an indemnity clause that changed.",
+      "For a training exercise, I need workplace fairness guidance, related public Singapore judgments, and official court hearing and service information.",
   },
 ] as const;
 
@@ -560,6 +560,7 @@ export const Tutor = () => {
     recommendationResult?.recommendations.filter((recommendation) =>
       selectedToolIds.includes(recommendation.tool.id),
     ) ?? [];
+  const hasRecommendations = Boolean(recommendationResult?.recommendations.length);
   const guidanceConnectionFailed = Boolean(
     guidance?.message.includes(OPENROUTER_CONNECTION_MESSAGE),
   );
@@ -653,8 +654,7 @@ export const Tutor = () => {
           </div>
           {recommendationResult.recommendations.length === 0 ? (
             <p className="no-results">
-              No curated tool clearly matches that objective yet. Rephrase it
-              as a software task or choose a sample scenario.
+              No suitable tools found at this moment.
             </p>
           ) : (
             <div className="card-grid">
@@ -762,7 +762,7 @@ export const Tutor = () => {
         </section>
       ) : null}
 
-      {recommendationResult ? (
+      {hasRecommendations ? (
           <section className="panel contextual-chat" aria-labelledby="contextual-heading">
             <div className="chat-heading">
               <div className="eyebrow">Continue learning</div>
@@ -868,24 +868,24 @@ export const Tutor = () => {
 
       <section className="panel scenario-panel" aria-label="Message composer">
         <form
-          onSubmit={recommendationResult ? askQuestion : submitScenario}
+          onSubmit={hasRecommendations ? askQuestion : submitScenario}
           className="scenario-form"
         >
-          <label className="sr-only" htmlFor={recommendationResult ? "question" : "scenario"}>
-            {recommendationResult
+          <label className="sr-only" htmlFor={hasRecommendations ? "question" : "scenario"}>
+            {hasRecommendations
               ? "Ask your next question"
               : "Describe your generic training objective"}
           </label>
           <textarea
-            id={recommendationResult ? "question" : "scenario"}
-            value={recommendationResult ? question : scenario}
+            id={hasRecommendations ? "question" : "scenario"}
+            value={hasRecommendations ? question : scenario}
             onChange={(event) =>
-              recommendationResult
+              hasRecommendations
                 ? setQuestion(event.target.value)
                 : setScenario(event.target.value)
             }
             placeholder={
-              recommendationResult
+              hasRecommendations
                 ? "Ask a follow-up about these tools"
                 : "Message L.A.R.A"
             }
@@ -894,13 +894,13 @@ export const Tutor = () => {
           <button
             type="submit"
             disabled={
-              recommendationResult
+              hasRecommendations
                 ? Boolean(pendingQuestion) || !question.trim() || !activeScenario
                 : isRecommending
             }
           >
             <span className="submit-label">
-              {recommendationResult
+              {hasRecommendations
                 ? "Ask"
                 : isRecommending
                   ? "Finding suitable tools…"
@@ -909,7 +909,7 @@ export const Tutor = () => {
             <span className="send-icon" aria-hidden="true">↑</span>
           </button>
         </form>
-        {!activeScenario ? (
+        {!activeScenario || (recommendationResult && !hasRecommendations) ? (
           <div className="sample-row" aria-label="Sample scenarios">
             <span>Try a sample:</span>
             {SAMPLES.map((sample) => (

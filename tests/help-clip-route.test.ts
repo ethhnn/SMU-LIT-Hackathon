@@ -36,7 +36,7 @@ describe("shared Help Clip route", () => {
     const response = await POST(
       requestFor({
         scenario,
-        toolIds: ["openlaw", "litera-compare"],
+        toolIds: ["openlaw", "tafep"],
         lessonPlanId: "openlaw-locate-search-field",
         supportTopicId: "openlaw-search-field",
         guidanceToken: "forged",

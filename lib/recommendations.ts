@@ -16,7 +16,6 @@ const externalRecommendationSchema = z.object({
         toolId: z.string(),
       }),
     )
-    .min(1)
     .max(3),
 });
 
@@ -25,24 +24,42 @@ type ScoredTool = {
   score: number;
 };
 
+const TOOL_MATCHERS: Record<ToolId, readonly RegExp[]> = {
+  tafep: [
+    /\btafep\b/i,
+    /\bworkplace\b/i,
+    /\bemploy(?:ment|er|ee|ees|ers)\b/i,
+    /\bfair(?:ness)?\b/i,
+    /\bunfair\b/i,
+    /\bdiscriminat(?:e|ion|ory)\b/i,
+    /\bharass(?:ment|ed|ing)?\b/i,
+    /\btripartite\b/i,
+  ],
+  openlaw: [
+    /\bopenlaw\b/i,
+    /\blawnet\b/i,
+    /\bjudg(?:e)?ment(?:s)?\b/i,
+    /\bcase law\b/i,
+    /\blegal precedent(?:s)?\b/i,
+    /\bsupreme court decision(?:s)?\b/i,
+  ],
+  judiciary: [
+    /\bjudiciary(?:\.gov\.sg)?\b/i,
+    /\bsg courts?\b/i,
+    /\bcourt (?:information|services?|hearings?|listings?|guides?)\b/i,
+    /\bhearing (?:search|date|dates|listings?)\b/i,
+    /\bfile (?:a )?(?:claim|case)\b/i,
+    /\bsheriff'?s sales?\b/i,
+    /\bfamily justice\b/i,
+    /\bstate courts?\b/i,
+  ],
+};
+
 const scoreScenario = (scenario: string): ScoredTool[] => {
-  const normalized = scenario.toLowerCase();
-  const scenarioTerms = new Set(normalized.match(/[a-z0-9]+/g) || []);
-  const scores: ScoredTool[] = TOOL_CATALOG.map((tool) => {
-    const searchable = [
-      tool.id,
-      tool.name,
-      tool.intendedUse,
-      ...tool.capabilities,
-    ]
-      .join(" ")
-      .toLowerCase();
-    const catalogTerms = new Set(searchable.match(/[a-z0-9]+/g) || []);
-    const score = [...scenarioTerms].filter(
-      (term) => term.length > 2 && catalogTerms.has(term),
-    ).length;
-    return { toolId: tool.id, score };
-  });
+  const scores: ScoredTool[] = TOOL_CATALOG.map((tool) => ({
+    toolId: tool.id,
+    score: TOOL_MATCHERS[tool.id].filter((matcher) => matcher.test(scenario)).length,
+  }));
 
   const matches = scores
     .filter((entry) => entry.score > 0)
@@ -93,9 +110,10 @@ export const recommendTools = async (
         {
           role: "system",
           content:
-            "You recommend software from a small, curated training catalog. " +
+            "You recommend software only from the three tools in the curated training catalog below. " +
             "Return only JSON with a recommendations array. Each entry must have toolId. " +
-            "Select only tools whose stated intended use or capabilities directly satisfy part of the objective; fewer accurate recommendations are better than adjacent but unsupported ones. Treat legislation, official gazettes, judgments, guidance, media announcements, document comparison, and document management as distinct needs. Never recommend a judgments tool as a source of enacted legislation, or a media page as an authoritative publication source. If the catalog does not cover part of the objective, do not disguise that gap by selecting an unrelated tool. " +
+            "Every toolId must exactly match an ID in the supplied catalog. Never name, suggest, or substitute any tool outside that catalog. " +
+            "Select only tools whose stated intended use or capabilities directly satisfy part of the objective; fewer accurate recommendations are better than adjacent but unsupported ones. If no catalog tool directly fits, return an empty recommendations array. Treat legislation, official gazettes, judgments, guidance, media announcements, document comparison, and document management as distinct needs. Never recommend a judgments tool as a source of enacted legislation, or a media page as an authoritative publication source. If the catalog does not cover part of the objective, do not disguise that gap by selecting an unrelated tool. " +
             "Do not give legal advice, determine legal relevance, " +
             "invent operational workflows, or describe cross-tool handoffs. Do not claim tutorial coverage.",
         },
@@ -121,7 +139,10 @@ export const recommendTools = async (
         isToolId(entry.toolId) &&
         entries.findIndex((candidate) => candidate.toolId === entry.toolId) === index,
     ) as Array<{ toolId: ToolId }>;
-    const recommendations = buildRecommendations(distinct);
+    const directMatches = new Set(scoreScenario(scenario).map((entry) => entry.toolId));
+    const recommendations = buildRecommendations(
+      distinct.filter((entry) => directMatches.has(entry.toolId)),
+    );
 
     return recommendations.length > 0
       ? { recommendations, source: "openrouter" }

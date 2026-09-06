@@ -7,8 +7,7 @@ import { TOOL_CATALOG } from "@/lib/catalog";
 
 const openlaw = TOOL_CATALOG.find((tool) => tool.id === "openlaw")!;
 const tafep = TOOL_CATALOG.find((tool) => tool.id === "tafep")!;
-const litera = TOOL_CATALOG.find((tool) => tool.id === "litera-compare")!;
-const imanage = TOOL_CATALOG.find((tool) => tool.id === "imanage")!;
+const judiciary = TOOL_CATALOG.find((tool) => tool.id === "judiciary")!;
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -17,8 +16,8 @@ const json = (body: unknown, status = 200) =>
   });
 
 const recommendations = [
-  { tool: litera, reason: "Litera Compare fits the comparison objective." },
-  { tool: imanage, reason: "iManage fits the organization objective." },
+  { tool: tafep, reason: "TAFEP fits the workplace-guidance objective." },
+  { tool: judiciary, reason: "Judiciary fits the court-information objective." },
   { tool: openlaw, reason: "OpenLaw fits the judgment-location objective." },
 ];
 
@@ -52,7 +51,7 @@ const unavailableGuidance = {
   message: "The selected tools can be explained at a high level.",
   teachingItems: [searchGuide],
   canGenerateHelpClip: false,
-  missingCoverage: ["Litera Compare needs reviewed screenshots."],
+  missingCoverage: ["TAFEP needs reviewed screenshots for this objective."],
 };
 
 const openLawGuidance = {
@@ -272,7 +271,7 @@ describe("Tutor shared Help Clip seam", () => {
     render(<Tutor />);
 
     await user.click(screen.getByRole("button", { name: "Combined task" }));
-    await screen.findByRole("heading", { name: /1\. Litera Compare/ });
+    await screen.findByRole("heading", { name: /1\. TAFEP/ });
 
     expect(screen.getAllByRole("checkbox", { name: "Include in shared Help Clip" })).toHaveLength(3);
     expect(screen.queryByRole("button", { name: /Explore/i })).not.toBeInTheDocument();
@@ -284,7 +283,7 @@ describe("Tutor shared Help Clip seam", () => {
     expect(screen.getByText("2 tools selected")).toBeVisible();
     const guidanceRequests = fetchMock.mock.calls.filter(([url]) => url === "/api/guidance");
     expect(JSON.parse(String(guidanceRequests.at(-1)?.[1]?.body)).toolIds).toEqual([
-      "litera-compare",
+      "tafep",
       "openlaw",
     ]);
 
@@ -335,7 +334,7 @@ describe("Tutor shared Help Clip seam", () => {
           ?.body,
       ),
     );
-    expect(request.toolIds).toEqual(["litera-compare", "imanage", "openlaw"]);
+    expect(request.toolIds).toEqual(["tafep", "judiciary", "openlaw"]);
   });
 
   it("clears the shared selection before a new chat submits another scenario", async () => {
@@ -448,7 +447,7 @@ describe("Tutor shared Help Clip seam", () => {
     await user.click(checkboxes[0]);
     await user.click(checkboxes[2]);
 
-    expect(await screen.findByText("Litera Compare needs reviewed screenshots.")).toBeVisible();
+    expect(await screen.findByText("TAFEP needs reviewed screenshots for this objective.")).toBeVisible();
     expect(screen.getByRole("button", { name: "Shared Help Clip coverage pending" })).toBeDisabled();
     await user.type(
       screen.getByLabelText("Ask your next question"),
@@ -460,7 +459,7 @@ describe("Tutor shared Help Clip seam", () => {
         ([url]) => url === "/api/contextual-question",
       );
       expect(JSON.parse(String(questionRequests.at(-1)?.[1]?.body))).toMatchObject({
-        toolIds: ["litera-compare", "openlaw"],
+        toolIds: ["tafep", "openlaw"],
         question: "How do these tools support the exercise?",
       });
     });

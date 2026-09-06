@@ -2,8 +2,6 @@ export const TOOL_IDS = [
   "openlaw",
   "tafep",
   "judiciary",
-  "litera-compare",
-  "imanage",
 ] as const;
 
 export type ToolId = (typeof TOOL_IDS)[number];
@@ -83,38 +81,6 @@ export const TOOL_CATALOG: readonly CatalogTool[] = [
     ],
     tutorialCoverage: "partial",
     coverageLabel: "Screenshot-guided Help Clips available",
-  },
-  {
-    id: "litera-compare",
-    name: "Litera Compare",
-    intendedUse: "Compare document versions and identify changes.",
-    capabilities: ["document comparison", "redlining", "contract changes"],
-    pros: [
-      "Highlights additions and deletions between versions",
-      "Useful for reviewing contract changes",
-    ],
-    cons: [
-      "Does not perform legal research",
-      "Tutorial assets are not yet added to this prototype",
-    ],
-    tutorialCoverage: "not-yet",
-    coverageLabel: "Tutorial assets not yet added",
-  },
-  {
-    id: "imanage",
-    name: "iManage",
-    intendedUse: "Organize legal documents and matter-related records.",
-    capabilities: ["document management", "matter organization", "version management"],
-    pros: [
-      "Centralizes legal document management",
-      "Supports versioning and matter organization",
-    ],
-    cons: [
-      "Not primarily a legal research or comparison tool",
-      "Tutorial assets are not yet added to this prototype",
-    ],
-    tutorialCoverage: "not-yet",
-    coverageLabel: "Tutorial assets not yet added",
   },
 ] as const;
 

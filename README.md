@@ -1,77 +1,200 @@
 # L.A.R.A
 
-L.A.R.A (Legal Adoption & Recommendation Assistant) helps a lawyer learn how to operate a relevant technology for a non-confidential training objective. It is a software-training tutor, not a legal-advice tool.
+L.A.R.A stands for **Legal Adoption & Recommendation Assistant**. It is a local software-training tutor that recommends supported legal information tools, explains how they fit a non-confidential objective, grounds guidance in supplied screenshots, and creates short narrated Help Clips.
 
-The learner writes a free-text objective or selects a sample. An OpenRouter-routed model recommends relevant technologies from a curated catalog, with intended uses, pros, limits, and tutorial coverage. The learner checks one or more recommended tools for a shared Help Clip and can continue with contextual teaching questions about that selected set.
+## Setup and run
 
-The active asset library contains 27 LawNet screenshots, 21 TAFEP screenshots, and 38 Judiciary.gov.sg screenshots. Asset preparation validates these images against the human-reviewed files in [`docs/references/`](docs/references/), then generates searchable metadata containing the correct website/product identity, visible controls, filters, captured state, and confirmed screenshot-to-screenshot paths. OpenRouter uses that metadata both to shortlist images and to interpret the selected screenshot. Screenshot Guides and generated videos reject disconnected scene sequences and use the reviewed path action between valid scenes. These images support labelled screenshot-observation clips; the separately reviewed OpenLaw workflow coverage remains limited to locating the Search field.
+### Prerequisites
 
-The recommendation catalogue is restricted to TAFEP, OpenLaw, and Judiciary.gov.sg / SG Courts. Model responses are validated against these three IDs, so unsupported or invented tools cannot appear as recommendations. Judiciary has screenshot-observation coverage but no manually rehearsed workflow. Collecting and describing screenshots does not by itself establish reviewed tutorial coverage.
+- Node.js 22 (the current project has been tested with `v22.14.0`)
+- pnpm 11 (tested with `11.19.0`)
+- An OpenRouter API key for AI screenshot interpretation, contextual answers, narration, and video generation
 
-The supplied R&T challenge focuses on technology adoption and short educational audio-video demonstrations grounded in practical use cases. The prototype does not establish sustained adoption or make legal judgments for the learner.
+### 1. Install dependencies
 
-```text
-Free-text training objective
-  → OpenRouter scenario interpretation
-  → Curated tool recommendations
-  → Checkbox selection for a shared Help Clip
-  → Validated human-reviewed screenshot reference index
-  → OpenRouter shortlist + ordered visual screenshot selection
-  → Shared contextual guidance and Help Focus
-  → Explicit Generate shared Help Clip request for grounded scenes
-  → OpenRouter supporting-style selection and TTS
-  → Remotion animation + FFmpeg MP4 processing
-  → Playable “Training demonstration” MP4
-  → Continuing question → answer → screenshot/optional video turns
+```powershell
+pnpm install
 ```
 
-The tutor never controls, observes, or automates the learner’s OpenLaw browser tab. It does not accept documents or confidential matter information, infer task completion, build progress tracking, invent cross-tool workflows or handoffs, or assess legal relevance.
+### 2. Create the local environment file
 
-## Run locally
+```powershell
+Copy-Item .env.example .env
+```
 
-1. Copy `.env.example` to `.env` and set `OPENROUTER_API_KEY`. Keep `.env` local; it is ignored by Git.
-2. Install dependencies with `pnpm install`.
-3. Start the tutor with `pnpm dev`.
-4. Open the local URL shown by Next.js.
+Open `.env` and add the OpenRouter key:
 
-The recommendation flow stays usable without a key through a catalog fallback, but screenshot interpretation and narrated Help Clips need the local OpenRouter key. Existing local `OPENAI_API_KEY` entries are accepted only as a migration alias for the supplied OpenRouter key; use `OPENROUTER_API_KEY` for new setup. `NEXT_PUBLIC_CONTEXTUAL_QUESTION_WINDOW=3` keeps the latest three complete question-and-answer turns as contextual memory for both image selection and answering.
+```dotenv
+OPENROUTER_API_KEY=your_key_here
+OPENROUTER_MODEL=openai/gpt-5.5
+OPENROUTER_TTS_MODEL=deepgram/flux-tts:free
+OPENROUTER_TTS_VOICE=flux-bree-en
+NEXT_PUBLIC_CONTEXTUAL_QUESTION_WINDOW=3
+OPENROUTER_SITE_URL=http://localhost:3000
+```
 
-## Verify the MVP
+Only `OPENROUTER_API_KEY` is required. The remaining values already have the defaults shown above. `OPENAI_API_KEY` is accepted as a migration alias, but new setups should use `OPENROUTER_API_KEY`. Keep `.env` local; Git ignores it.
 
-Run the lightweight user-facing checks:
+### 3. Start the development server
 
-```bash
+```powershell
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). The development command validates and prepares all screenshot assets before starting Next.js.
+
+If OpenRouter requests fail even with a valid key, confirm that the process running `pnpm dev` has outbound network access to `https://openrouter.ai`.
+
+### 4. Production build
+
+```powershell
+pnpm build
+pnpm start
+```
+
+## Supported tools
+
+L.A.R.A has exactly three predefined recommendation targets:
+
+| Tool | Supported purpose |
+| --- | --- |
+| TAFEP | Fair employment practices, workplace fairness, tripartite guidelines, resources, events, and related guidance |
+| OpenLaw | Finding and reviewing public Singapore Supreme Court judgments |
+| Judiciary.gov.sg / SG Courts | Court information, hearing listings, judgments, self-help guides, court services, e-platforms, and Sheriff's sales |
+
+The model receives only these three catalog entries. Every returned tool ID is checked against the same allowlist and a local direct-match gate before it reaches the interface. L.A.R.A cannot display an invented or outside product as a recommendation. When none of the three tools directly fits the objective, the app returns:
+
+> No suitable tools found at this moment.
+
+It does not force an unrelated recommendation.
+
+## How to use L.A.R.A
+
+### Ask for recommendations
+
+Enter a non-confidential training objective in the message box or choose a sample prompt. Sending the message clears the composer and displays the original objective as the learner's chat message. L.A.R.A then shows up to three suitable tools with their intended use, advantages, limitations, and current tutorial coverage.
+
+### Create a shared Help Clip
+
+Select one or more recommended tools with the checkboxes. L.A.R.A retrieves relevant supplied screenshots, checks their reviewed descriptions and confirmed paths, and displays grounded Screenshot Guides. The **Generate shared Help Clip** button is enabled only when every selected tool has a valid grounded scene and Lesson Plan.
+
+Video generation uses:
+
+1. OpenRouter to select a restrained narration style.
+2. OpenRouter text-to-speech to create MP3 narration.
+3. Remotion to animate screenshots, highlights, and captions.
+4. FFmpeg to produce a browser-ready H.264 MP4.
+
+Completed videos are saved in `public/generated/` and returned with the label **Training demonstration**. Only one Help Clip render can run at a time.
+
+### Continue the conversation
+
+After recommendations appear, the same bottom composer becomes the contextual-question box. Follow-up answers use the checked tools as context. If no tools are checked, all recommended tools are used. The default memory window retains the latest three complete question-and-answer turns and can be changed with `NEXT_PUBLIC_CONTEXTUAL_QUESTION_WINDOW`.
+
+A contextual answer can include its own grounded screenshots and Help Clip action when validated visual coverage exists.
+
+### View generated videos
+
+Select **Video gallery** beneath **New chat** in the sidebar. The gallery reads locally stored MP4 files from `public/generated/`, lists them newest first, and provides browser playback. Use **Refresh** after generating a clip if it has not appeared yet.
+
+## Application flow
+
+```text
+Training objective
+  → strict three-tool recommendation
+  → tool selection
+  → reviewed screenshot metadata and path validation
+  → OpenRouter screenshot selection and interpretation
+  → grounded Screenshot Guides
+  → explicit Help Clip request
+  → OpenRouter narration style and text-to-speech
+  → Remotion rendering and FFmpeg processing
+  → local MP4 and Video gallery
+  → continued contextual question-and-answer turns
+```
+
+When no API key is available, initial recommendations still use the deterministic local catalog matcher. OpenRouter-dependent screenshot interpretation, contextual AI answers, narration, and Help Clip creation require a working key and network connection.
+
+## Screenshot assets
+
+The repository contains 86 source screenshots:
+
+| Collection | Source folder | Images |
+| --- | --- | ---: |
+| LawNet and OpenLaw | [`Screenshots/LawNetScreenshots/`](Screenshots/LawNetScreenshots/) | 27 |
+| TAFEP | [`Screenshots/TAFEPScreenshots/`](Screenshots/TAFEPScreenshots/) | 21 |
+| Judiciary.gov.sg / SG Courts | [`Screenshots/JudiciaryGovScreenshots/`](Screenshots/JudiciaryGovScreenshots/) | 38 |
+
+Human-reviewed descriptions, visible controls, and confirmed screenshot paths are stored in [`docs/references/`](docs/references/). `pnpm prepare-assets` verifies that every source PNG has one matching reference entry, checks confirmed paths, copies runtime originals, creates thumbnails, and rebuilds the manifest and searchable metadata under `public/assets/screenshots/`.
+
+Do not edit generated runtime metadata directly. Update the source screenshot or its reference Markdown, then run:
+
+```powershell
+pnpm prepare-assets
+```
+
+Screenshot observations and reviewed instructions are labelled separately. A visual match does not prove that a live website action or legal transaction was completed. Within one tool, consecutive tutorial scenes must follow a confirmed path. Switching tools starts a separate route and is never described as a click between websites.
+
+### OpenLaw coverage boundary
+
+The manually reviewed OpenLaw workflow currently confirms the starting judgments screen and the instruction to locate the Search field. Populated search, submitted results, and opening a matching judgment still require separately captured and rehearsed evidence. Other supplied screenshots can support clearly labelled screenshot observations when they directly answer the objective.
+
+## API routes
+
+| Route | Purpose |
+| --- | --- |
+| `POST /api/recommend` | Returns zero to three allowlisted tool recommendations |
+| `POST /api/guidance` | Builds grounded shared guidance for selected tools |
+| `POST /api/contextual-question` | Answers a follow-up using selected or recommended tool context |
+| `POST /api/help-clip` | Validates a signed grounded Lesson Plan and renders a Help Clip |
+| `GET /api/videos` | Lists locally generated MP4 files for the Video gallery |
+
+Recommendation objectives and contextual questions are limited to 1,200 characters. Guidance and Help Clips accept one to three unique allowlisted tools. Help Clip requests require a signed token issued with validated guidance, preventing the client from inventing scenes or Lesson Plans.
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Prepare screenshot assets and start the Next.js development server |
+| `pnpm build` | Prepare assets and create a production build |
+| `pnpm start` | Run the completed production build |
+| `pnpm test` | Run the Vitest test suite once |
+| `pnpm test:watch` | Run Vitest in watch mode |
+| `pnpm prepare-assets` | Validate screenshots and regenerate runtime image assets and metadata |
+| `pnpm render:demo` | Generate a real narrated OpenLaw demonstration clip using OpenRouter |
+
+## Verification
+
+Run the automated checks:
+
+```powershell
 pnpm test
 pnpm build
 ```
 
-After adding the API key, run one real-media check:
+With `OPENROUTER_API_KEY` configured, run the real media check:
 
-```bash
+```powershell
 pnpm render:demo
 ```
 
-It writes a narrated MP4 to `public/generated/`. Inspect it for audible narration, readable captions, aligned search-field highlight, and normal playback. This manual check is required before claiming the playable Help Clip milestone is complete.
+The demo writes an MP4 to `public/generated/`. Confirm that narration is audible, captions are readable, the highlight aligns with the intended interface element, and playback completes normally.
 
-## Current OpenLaw asset boundary
+## Project structure
 
-- **Ready:** the starting OpenLaw judgments screen and the reviewed instruction to locate the Search field.
-- **Pending manual capture and rehearsal:** populated search, submitted results, and opened matching judgment.
+```text
+app/                    Next.js pages and API routes
+components/             Chat interface, tool selection, guides, and gallery
+lib/                    Catalog, recommendation, screenshot, guidance, and video logic
+remotion/               Help Clip composition
+scripts/                Asset preparation and real-media demo
+Screenshots/            Human-supplied source screenshots
+docs/references/        Human-reviewed screenshot descriptions and paths
+public/assets/          Prepared runtime screenshot assets
+public/generated/       Locally generated media; ignored by Git
+tests/                  Vitest route, logic, and interface tests
+```
 
-The app labels screenshot observations separately from reviewed actions. One to three supplied images may produce a screenshot-based clip after multimodal selection. Broad objectives can use an access scene followed by destination-page scenes; narrow questions should keep the sequence minimal. Do not represent the four-step judgment-location workflow or an unreviewed cross-tool handoff as verified until the remaining materials are captured, reviewed, and rehearsed.
+## Product boundary
 
-## Screenshot inventory
-
-The repository contains 86 source screenshots named by page, section, or interface state:
-
-| Collection | Source folder | Images | Runtime status |
-| --- | --- | --- | --- |
-| LawNet/OpenLaw | [LawNetScreenshots](Screenshots/LawNetScreenshots/) | 27 | Indexed for screenshot selection |
-| TAFEP | [TAFEPScreenshots](Screenshots/TAFEPScreenshots/) | 21 | Indexed for screenshot selection |
-| Judiciary.gov.sg (SG Courts) | [JudiciaryGovScreenshots](Screenshots/JudiciaryGovScreenshots/) | 38 | Indexed for screenshot selection |
-
-Judiciary captures include homepage menus, hearing-search filters, judgments, court services, e-platforms, Sheriff's sales and admiralty services, contact information, and court information pages. Asset preparation indexes all 86 images and fails if a source screenshot and its Markdown reference do not match. Highlights must match each exact captured layout; signed-in pages and public OpenLaw pages are distinct interface states.
-
-## Screenshot references
-
-The human-reviewed screenshot index is in [docs/references/](docs/references/). Keep those files aligned with the source images because asset preparation validates them before development and production builds.
+L.A.R.A is a software-training prototype. It does not provide legal advice, decide legal relevance, inspect or control a learner's live browser, accept confidential matter documents, confirm that a website task was completed, or track long-term technology adoption. The learner remains responsible for legal judgment and for verifying information on the live source website.
